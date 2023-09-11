@@ -29,6 +29,7 @@
 #include <lvgl.h>
 #include "lv_port_disp.h"
 #include "screen.h"
+#include "ui/ui.h"
 
 #define LV_TICK_PERIOD_MS 1
 
@@ -61,7 +62,7 @@ void ScreenController::start(void *pvParameter){
 
     ESP_LOGI(TAG, "display init done.");
 
-    lv_example_anim();
+    ui_init();
 
     while (1)
     {
