@@ -14,6 +14,12 @@
 #include "screen.h"
 
 #define POWER_LED_PIN 13
+#define SCREEN_RST_PIN 15
+#define SCREEN_CS_PIN 4
+#define SCREEN_DC_PIN 21
+// MOSI_PIN 
+// MISO_PIN
+// SCK_PIN
 
 
 ScreenController screen;

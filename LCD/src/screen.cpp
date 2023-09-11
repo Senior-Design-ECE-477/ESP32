@@ -3,9 +3,6 @@
  * ScreenController cpp file
  */
 
-// -- Includes --
-
-// #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -22,32 +19,44 @@
 
 // LVGL Settings then Include
 #define TAG "screen"
-#define LV_HOR_RES_MAX 320
-#define LV_VER_RES_MAX 240
+#define LV_HOR_RES_MAX 240
+#define LV_VER_RES_MAX 320
+#define MY_DISP_HOR_RES 240
+#define MY_DISP_VER_RES 320
 #define LV_LVGL_H_INCLUDE_SIMPLE
+#define LV_TICK_PERIOD_MS 1
+
+#define CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9341
+#define CONFIG_LV_DISP_PIN_DC 15
+#define CONFIG_LV_DISP_PIN_RST 4
+#define CONFIG_LV_DISP_USE_RST 1
 
 #include <lvgl.h>
+// #include "lvgl_helpers.h"
 #include "lv_port_disp.h"
 #include "screen.h"
 #include "ui/ui.h"
 
-#define LV_TICK_PERIOD_MS 1
 
-
-void lv_example_anim(void);
+SemaphoreHandle_t xGuiSemaphore;
 
 ScreenController::ScreenController(){
 
 }
+void lv_tick_task(void *arg) {
+    (void) arg;
+    lv_tick_inc(LV_TICK_PERIOD_MS);
+}
 
 void ScreenController::start(void *pvParameter){
-    SemaphoreHandle_t xGuiSemaphore;
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
 
+    // lvgl
     lv_init();
-
+    // driver and buffer
     lv_port_disp_init();
+    // lvgl_driver_init();
 
 
     // Setup timer system
@@ -58,31 +67,30 @@ void ScreenController::start(void *pvParameter){
     esp_timer_handle_t periodic_timer;
     ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
-
-
     ESP_LOGI(TAG, "display init done.");
 
+    // start ui
     ui_init();
 
+    // loop
     while (1)
     {
-    /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
-    vTaskDelay(pdMS_TO_TICKS(10));
+        /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
+        vTaskDelay(pdMS_TO_TICKS(10));
 
-    /* Try to take the semaphore, call lvgl related function on success */
-    if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
-    {
+        /* Try to take the semaphore, call lvgl related function on success */
+        
+        if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+        {
+            // lv_task_handler();
+            xSemaphoreGive(xGuiSemaphore);
+        }
         lv_task_handler();
-        xSemaphoreGive(xGuiSemaphore);
-    }
     }
 
     /* A task should NEVER return */
     // free(buf1);
     vTaskDelete(NULL);
-    
-    
-
 }
 
 void ScreenController::accepted(int ms){
@@ -97,54 +105,9 @@ void ScreenController::home(){
     
 }
 
-void ScreenController::lv_tick_task(void *arg) {
-    (void) arg;
-    lv_tick_inc(LV_TICK_PERIOD_MS);
-}
 
 
-static void anim_x_cb(void *var, int32_t v)
-{
-  lv_obj_set_x((_lv_obj_t *)var, v);
-}
 
-static void anim_size_cb(void *var, int32_t v)
-{
-  lv_obj_set_size((_lv_obj_t *)var, v, v);
-}
-
-/**
- * Create a playback animation
- */
-void lv_example_anim(void)
-{
-  lv_obj_t *label = lv_label_create(lv_scr_act());
-  lv_label_set_text(label, "Hello World!");
-  lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-  lv_obj_t *obj = lv_obj_create(lv_scr_act());
-  lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_RED), 0);
-  lv_obj_set_style_radius(obj, LV_RADIUS_CIRCLE, 0);
-
-  lv_obj_align(obj, LV_ALIGN_LEFT_MID, 10, 0);
-
-  lv_anim_t a;
-  lv_anim_init(&a);
-  lv_anim_set_var(&a, obj);
-  lv_anim_set_values(&a, 10, 50);
-  lv_anim_set_time(&a, 1000);
-  lv_anim_set_playback_delay(&a, 100);
-  lv_anim_set_playback_time(&a, 300);
-  lv_anim_set_repeat_delay(&a, 500);
-  lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-  lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
-
-  lv_anim_set_exec_cb(&a, anim_size_cb);
-  lv_anim_start(&a);
-  lv_anim_set_exec_cb(&a, anim_x_cb);
-  lv_anim_set_values(&a, 0, 190);
-  lv_anim_start(&a);
-}
 
 
 

@@ -41,7 +41,7 @@ public:
     void home();
 
 private:
-    static void lv_tick_task(void *arg);
+    static void ticker(void *arg);
 
 };
 
