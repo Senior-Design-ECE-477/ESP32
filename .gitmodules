@@ -1,6 +1,9 @@
-[submodule "LCD/lib/lvgl"]
-	path = LCD/lib/lvgl
-	url = https://github.com/lvgl/lvgl.git
 [submodule "LCD/lib/lv_drivers"]
 	path = LCD/lib/lv_drivers
 	url = https://github.com/lvgl/lv_drivers.git
+[submodule "LCD/lib/lvgl_esp32_drivers"]
+	path = LCD/lib/lvgl_esp32_drivers
+	url = https://github.com/hiruna/lvgl_esp32_drivers.git
+[submodule "LCD/lib/lvgl"]
+	path = LCD/lib/lvgl
+	url = https://github.com/lvgl/lvgl.git
