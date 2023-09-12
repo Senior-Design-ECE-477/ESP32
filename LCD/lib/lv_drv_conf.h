@@ -14,13 +14,14 @@
 #define LV_DRV_CONF_H
 
 #include "lv_conf.h"
+#include "../src/drivers/SPImacros.h"
 
 /*********************
  * DELAY INTERFACE
  *********************/
 #define LV_DRV_DELAY_INCLUDE  <stdint.h>            /*Dummy include by default*/
-#define LV_DRV_DELAY_US(us)  /*delay_us(us)*/       /*Delay the given number of microseconds*/
-#define LV_DRV_DELAY_MS(ms)  /*delay_ms(ms)*/       /*Delay the given number of milliseconds*/
+#define LV_DRV_DELAY_US(us)   delay_micro_sec(us)/*delay_us(us)*/       /*Delay the given number of microseconds*/
+#define LV_DRV_DELAY_MS(ms)   delay_milli_sec(ms)/*delay_ms(ms)*/       /*Delay the given number of milliseconds*/
 
 /*********************
  * DISPLAY INTERFACE
@@ -30,15 +31,15 @@
  *  Common
  *------------*/
 #define LV_DRV_DISP_INCLUDE         <stdint.h>           /*Dummy include by default*/
-#define LV_DRV_DISP_CMD_DATA(val)  /*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
-#define LV_DRV_DISP_RST(val)       /*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
+#define LV_DRV_DISP_CMD_DATA(val)   set_x_pin_to(SCREEN_DC_PIN, val)/*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
+#define LV_DRV_DISP_RST(val)        set_x_pin_to(SCREEN_RST_PIN, val)/*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
 
 /*---------
  *  SPI
  *---------*/
-#define LV_DRV_DISP_SPI_CS(val)          /*spi_cs_set(val)*/     /*Set the SPI's Chip select to 'val'*/
-#define LV_DRV_DISP_SPI_WR_BYTE(data)    /*spi_wr(data)*/        /*Write a byte the SPI bus*/
-#define LV_DRV_DISP_SPI_WR_ARRAY(adr, n) /*spi_wr_mem(adr, n)*/  /*Write 'n' bytes to SPI bus from 'adr'*/
+#define LV_DRV_DISP_SPI_CS(val)          set_x_pin_to(SCREEN_CS_PIN, val)/*spi_cs_set(val)*/     /*Set the SPI's Chip select to 'val'*/
+#define LV_DRV_DISP_SPI_WR_BYTE(data)    spi_write_screen_data(data)/*spi_wr(data)*/        /*Write a byte the SPI bus*/
+#define LV_DRV_DISP_SPI_WR_ARRAY(adr, n) spi_write_screen_memory(adr, n)/*spi_wr_mem(adr, n)*/  /*Write 'n' bytes to SPI bus from 'adr'*/
 
 /*------------------
  *  Parallel port

@@ -30,11 +30,13 @@
 #define CONFIG_LV_DISP_PIN_DC 15
 #define CONFIG_LV_DISP_PIN_RST 4
 #define CONFIG_LV_DISP_USE_RST 1
+#define CONFIG_LV_PREDEFINED_DISPLAY_NONE
 
 #include <lvgl.h>
 // #include "lvgl_helpers.h"
 #include "lv_port_disp.h"
 #include "screen.h"
+#include "drivers/ILI9341.h"
 #include "ui/ui.h"
 
 
@@ -43,7 +45,8 @@ SemaphoreHandle_t xGuiSemaphore;
 ScreenController::ScreenController(){
 
 }
-void lv_tick_task(void *arg) {
+
+void ScreenController::ticker(void *arg) {
     (void) arg;
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
@@ -55,13 +58,14 @@ void ScreenController::start(void *pvParameter){
     // lvgl
     lv_init();
     // driver and buffer
+    // ili9341_init();
     lv_port_disp_init();
     // lvgl_driver_init();
 
 
     // Setup timer system
     const esp_timer_create_args_t periodic_timer_args = {
-        .callback = &lv_tick_task,
+        .callback = &ticker,
         .name = "lvgl_tick_inc",
     };
     esp_timer_handle_t periodic_timer;
@@ -79,13 +83,11 @@ void ScreenController::start(void *pvParameter){
         vTaskDelay(pdMS_TO_TICKS(10));
 
         /* Try to take the semaphore, call lvgl related function on success */
-        
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
         {
-            // lv_task_handler();
+            lv_task_handler();
             xSemaphoreGive(xGuiSemaphore);
         }
-        lv_task_handler();
     }
 
     /* A task should NEVER return */

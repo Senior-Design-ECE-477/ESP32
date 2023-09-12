@@ -36,7 +36,7 @@ extern "C" void app_main() {
 
     /**
      * @brief Wifi
-     * Start the wifi loop code on CPU core 0
+     * Start the wifi/cloud loop code on CPU core 0
     */
 
     /**
