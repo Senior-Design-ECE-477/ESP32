@@ -31,8 +31,8 @@
  *  Common
  *------------*/
 #define LV_DRV_DISP_INCLUDE         <stdint.h>           /*Dummy include by default*/
-#define LV_DRV_DISP_CMD_DATA(val)   set_x_pin_to(SCREEN_DC_PIN, val)/*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
-#define LV_DRV_DISP_RST(val)        set_x_pin_to(SCREEN_RST_PIN, val)/*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
+#define LV_DRV_DISP_CMD_DATA(val)   set_x_pin_to(SCREEN_DC_RS_PIN, val)/*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
+#define LV_DRV_DISP_RST(val)        //set_x_pin_to(SCREEN_RES, val)/*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
 
 /*---------
  *  SPI

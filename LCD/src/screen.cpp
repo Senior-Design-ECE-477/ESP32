@@ -14,6 +14,8 @@
 #include <freertos/semphr.h>
 #include <esp_system.h>
 #include <driver/gpio.h>
+#include <driver/spi_common.h>
+#include <driver/spi_master.h>
 #include <esp_log.h>
 #include <esp_timer.h>
 
@@ -40,7 +42,10 @@
 #include "ui/ui.h"
 
 
+// #define 
+
 SemaphoreHandle_t xGuiSemaphore;
+
 
 ScreenController::ScreenController(){
 
@@ -54,6 +59,10 @@ void ScreenController::ticker(void *arg) {
 void ScreenController::start(void *pvParameter){
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
+
+
+
+
 
     // lvgl
     lv_init();
