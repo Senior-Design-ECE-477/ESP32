@@ -37,7 +37,7 @@
 #include <lvgl.h>
 // #include "lvgl_helpers.h"
 #include "lv_port_disp.h"
-#include "screen.h"
+#include "screen_controller.h"
 #include "drivers/ILI9341.h"
 #include "ui/ui.h"
 
@@ -47,7 +47,7 @@
 SemaphoreHandle_t xGuiSemaphore;
 
 
-ScreenController::ScreenController(){
+ScreenController::ScreenController() {
 
 }
 
@@ -60,17 +60,10 @@ void ScreenController::start(void *pvParameter){
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
 
-
-
-
-
     // lvgl
     lv_init();
     // driver and buffer
-    // ili9341_init();
     lv_port_disp_init();
-    // lvgl_driver_init();
-
 
     // Setup timer system
     const esp_timer_create_args_t periodic_timer_args = {

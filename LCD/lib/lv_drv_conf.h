@@ -14,7 +14,8 @@
 #define LV_DRV_CONF_H
 
 #include "lv_conf.h"
-#include "../src/drivers/SPImacros.h"
+#include "spi_controller.h"
+
 
 /*********************
  * DELAY INTERFACE
@@ -31,15 +32,15 @@
  *  Common
  *------------*/
 #define LV_DRV_DISP_INCLUDE         <stdint.h>           /*Dummy include by default*/
-#define LV_DRV_DISP_CMD_DATA(val)   set_x_pin_to(SCREEN_DC_RS_PIN, val)/*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
-#define LV_DRV_DISP_RST(val)        //set_x_pin_to(SCREEN_RES, val)/*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
+#define LV_DRV_DISP_CMD_DATA(val)   set_this_pin_to(SCREEN_DC_RS_PIN, val)/*pin_x_set(val)*/    /*Set the command/data pin to 'val'*/
+#define LV_DRV_DISP_RST(val)        set_this_pin_to(SCREEN_RESET_PIN, val)/*pin_x_set(val)*/    /*Set the reset pin to 'val'*/
 
 /*---------
  *  SPI
  *---------*/
-#define LV_DRV_DISP_SPI_CS(val)          set_x_pin_to(SCREEN_CS_PIN, val)/*spi_cs_set(val)*/     /*Set the SPI's Chip select to 'val'*/
-#define LV_DRV_DISP_SPI_WR_BYTE(data)    spi_write_screen_data(data)/*spi_wr(data)*/        /*Write a byte the SPI bus*/
-#define LV_DRV_DISP_SPI_WR_ARRAY(adr, n) spi_write_screen_memory(adr, n)/*spi_wr_mem(adr, n)*/  /*Write 'n' bytes to SPI bus from 'adr'*/
+#define LV_DRV_DISP_SPI_CS(val)          set_this_pin_to(SCREEN_CS_PIN, val)/*spi_cs_set(val)*/     /*Set the SPI's Chip select to 'val'*/
+#define LV_DRV_DISP_SPI_WR_BYTE(data)    write_data_to_spi(data)/*spi_wr(data)*/        /*Write a byte the SPI bus*/
+#define LV_DRV_DISP_SPI_WR_ARRAY(adr, n) write_buffer_to_spi(adr, n)/*spi_wr_mem(adr, n)*/  /*Write 'n' bytes to SPI bus from 'adr'*/
 
 /*------------------
  *  Parallel port
