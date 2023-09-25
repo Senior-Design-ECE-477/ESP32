@@ -11,7 +11,7 @@
 
 void pwmControllerInit(void)
 {
-    ledc_channel_config_t ledc_channel_left = {
+    ledc_channel_config_t ledc_channel = {
         .gpio_num = LED_PWM_PIN,
         .speed_mode = LEDC_HIGH_SPEED_MODE,
         .channel = LED_PWM_CHANNEL,
@@ -27,15 +27,15 @@ void pwmControllerInit(void)
         .freq_hz = 100000,
     };
 
-    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel_left));
+    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
 }
 
-void pwmControllerSet(float left_duty_fraction)
+void pwmControllerSet(float percent_fraction)
 {
     uint32_t max_duty = (1 << LED_PWM_BIT_NUM) - 1;
-    uint32_t left_duty = lroundf(left_duty_fraction * (float)max_duty);
+    uint32_t duty_cycle = lroundf(percent_fraction * (float)max_duty);
 
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_HIGH_SPEED_MODE, LED_PWM_CHANNEL, left_duty));
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_HIGH_SPEED_MODE, LED_PWM_CHANNEL, duty_cycle));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_HIGH_SPEED_MODE, LED_PWM_CHANNEL));
 }
