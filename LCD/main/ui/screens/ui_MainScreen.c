@@ -47,9 +47,6 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_width(ui_BackgroundImage, 240);  /// 1
     lv_obj_set_height(ui_BackgroundImage, 320); /// 1
     lv_obj_align(ui_BackgroundImage, NULL, LV_ALIGN_CENTER, 0, 0);
-    // lv_obj_add_flag(ui_BackgroundImage, LV_OBJ_FLAG_ADV_HITTEST);  /// Flags
-    // lv_obj_clear_flag(ui_BackgroundImage, LV_OBJ_FLAG_SCROLLABLE); /// Flags
-    // lv_obj_set_style_bg_img_src(ui_BackgroundImage, &TemporaryImage, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ColorPanel = lv_obj_create(ui_BackgroundImage, NULL);
     lv_obj_set_width(ui_ColorPanel, 240);
@@ -62,9 +59,6 @@ void ui_MainScreen_screen_init(void)
     lv_style_set_border_width(&colorPanelStyle, LV_STATE_DEFAULT, 0);
     lv_style_set_radius(&colorPanelStyle, LV_STATE_DEFAULT, 16);
     lv_obj_add_style(ui_ColorPanel, LV_OBJ_PART_MAIN, &colorPanelStyle);
-    // lv_obj_clear_flag(ui_ColorPanel, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN); /// Flags
-    // lv_obj_set_style_local_bg_color(ui_ColorPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    // lv_obj_set_style_bg_opa(ui_ColorPanel, 125, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_LockIcon = lv_img_create(ui_ColorPanel, NULL);
     lv_img_set_src(ui_LockIcon, &ui_img_locked_png);
@@ -78,8 +72,6 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_height(ui_UnlockIcon, 64); /// 1
     lv_obj_set_hidden(ui_UnlockIcon, true);
     lv_obj_align(ui_UnlockIcon, NULL, LV_ALIGN_CENTER, 0, -100);
-    // lv_obj_add_flag(ui_UnlockIcon, LV_OBJ_FLAG_HIDDEN);                                                                                                                                                                                                         /// Flags
-    // lv_obj_clear_flag(ui_UnlockIcon, LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN); /// Flags
 
     ui_TimeLabel = lv_label_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_TimeLabel, LV_SIZE_CONTENT);  /// 1
