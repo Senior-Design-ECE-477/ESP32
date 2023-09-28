@@ -1,9 +1,6 @@
 [submodule "LCD/components/lvgl"]
-	path = LCD/components/lvgl
+	path = components/lvgl
 	url = https://github.com/lvgl/lvgl.git
 [submodule "LCD/components/lvgl_esp32_drivers"]
-	path = LCD/components/lvgl_esp32_drivers
+	path = components/lvgl_esp32_drivers
 	url = https://github.com/lvgl/lvgl_esp32_drivers.git
-[submodule "LCD/components/lv_examples/lv_examples"]
-	path = LCD/components/lv_examples/lv_examples
-	url = https://github.com/littlevgl/lv_examples.git
