@@ -84,10 +84,18 @@ Then go into the components/lvgl_esp32_drivers folder
 cd ./components/lvgl_esp32_drivers
 ```
 
-Finally, set git to use the correct version of lvgl_esp32_drivers with
+Set git to use the correct version of lvgl_esp32_drivers with
 
 ```shell
 git checkout 9fed1cc
+```
+
+Now move the ili9341.c file found in the same directory as this README, into `components/lvgl_esp32_driver/lvgl_tft`, replacing the file that is already there. This file has the follwing updates made to it to fix build errors.
+
+```C
+gpio_pad_select_gpio(...);   ->   esp_rom_gpio_pad_select_gpio(...);
+
+portTICK_RATE_MS   ->   portTICK_PERIOD_MS
 ```
 
 ### Build
