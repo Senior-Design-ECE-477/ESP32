@@ -98,6 +98,14 @@ gpio_pad_select_gpio(...);   ->   esp_rom_gpio_pad_select_gpio(...);
 portTICK_RATE_MS   ->   portTICK_PERIOD_MS
 ```
 
+### Config
+
+Open the `menuconfig` by clicking the settings icon by build.\
+Scroll down to lvgl configuration and set driver to ILI9341.\
+Also set pin configuration here.\
+
+A sample sdkconfig file is provided for ESP32 Feather V2.
+
 ### Build
 
 Open this folder in VSCode and enable the Espressif IDF extension.
