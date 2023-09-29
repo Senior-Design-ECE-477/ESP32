@@ -14,8 +14,6 @@ extern "C"
 #include "lvgl/lvgl.h"
 #endif
 
-#include "ui_events.h"
-
 #define LV_SIZE_CONTENT 1
 
     void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);

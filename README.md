@@ -1,31 +1,13 @@
-# Cloud Authenticated Fingerprint Scanner (CAFS) based on the ESP32
+# Cloud Authenticated Fingerprint Scanner (CAFS)
 
-All code in this Repository is to be flashed onto the microcontroller for working access.
-
-Folder Heirarchy
-
-main\
-├─── aws\
-│ └─── aws_http\
-├─── screen\
-│ └─── screen_controller\
-├─── ui\
-│ ├─── animations\
-│ ├─── images\
-│ ├─── screens\
-│ └─── ui\
-├─── utils\
-│ ├─── wifi\
-│ ├─── pwm_controller\
-│ └─── ntp_time\
-└─── main
+All code in this Repository is to be flashed onto a ESP32 microcontroller for working access. This repository has been built and tested on the Adafruit ESP32 Feather V2 with ESP IDF v5.2.2.
 
 ## Installation
 
 ### Prequisites
 
 - VSCode
-- Espressif IDF extension for VSCode
+- Espressif IDF extension for VSCode (installs required tools)
 - An ESP32 Microcontroller
 - Git
 
@@ -37,7 +19,7 @@ Clone this repository into your workspace.
 - Run the follwing command
 
 ```
-git clone https://
+git clone https://github.com/Senior-Design-ECE-477/ESP32.git
 ```
 
 #### Add Submodule: lvgl
@@ -101,8 +83,8 @@ portTICK_RATE_MS   ->   portTICK_PERIOD_MS
 ### Config
 
 Open the `menuconfig` by clicking the settings icon by build.\
-Scroll down to lvgl configuration and set driver to ILI9341.\
-Also set pin configuration here.\
+Scroll down to lvgl configuration and make sure driver is set to ILI9341.\
+Also set pin configuration here.
 
 A sample sdkconfig file is provided for ESP32 Feather V2.
 
@@ -114,20 +96,32 @@ Connect your microcontroller and select the port. Then, within the ESP IDF Explo
 
 Once the microcontroller is connected to the extension, you can build then upload the code.
 
+## PWM for the LCD Screen's LED Backlight
+
+The PWM Controller file has definitions for pin (default 21:MISO), frequency (100KHz), duty resolution bits (5-bit), LEDC timer (1), and LEDC channel (1).\
+Use `pwmControllerInit()` to initialize LEDC and configure the duty resolution.\
+Use `pwmControllerSet(float percent_fraction)` to set the duty cycle. The function takes a float in the interval [0, 1]. 0 is off while 1 is max duty.
+
+```C
+pwmControllerInit();     // Initialize PWM LEDC channel and timer
+pwmControllerSet(0.05);  // PWM signal for dimmed mode
+pwmControllerSet(1);     // PWM signal for bright mode
+```
+
 ## LCD Screen
 
 Start the screen by running `runScreenGUI()` in a seperate thread by calling `xTaskCreatePinnedToCore`. Now any of these functions will works:
 
-`ui_init` Initialize the UI.\
+`ui_init` Initialize the UI for lvgl. Called by `runScreenGUI`.\
 `ui_Unlock` Unlock the lock indicator icon.\
 `ui_Lock` Lock the lock indicator icon.\
 `ui_TimeAndIconsToTop_Animation` Run the animation move the lock icon and time label up to the top of the screen.\
 `ui_Welcome_Animation` Run the animation to go to welcome screen, and then back to normal.\
 `ui_ShowKeypad_Animation` Run the animation to show the keypad screen.\
 `ui_ShakeKeypad_Animation` Run the animation to shake the keypad rapidly.\
-`ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.\
+`ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.
 
-Full example going through all the animations:
+Full example going through all the animations and PWM.
 
 ```C
 
@@ -161,12 +155,6 @@ void app_main()
 }
 
 ```
-
-## PWM for the LCD Screen's LED Backlight
-
-The PWM Controller file has definitions for pin (default 21:MISO), frequency (100KHz), duty resolution bits (5-bit), LEDC timer (1), and LEDC channel (1).\
-Use `pwmControllerInit()` to initialize LEDC and configure the duty resolution.\
-Use `pwmControllerSet(float percent_fraction)` to set the duty cycle. The function takes a float in the interval [0, 1]. 0 is off while 1 is max duty.
 
 ## Time
 

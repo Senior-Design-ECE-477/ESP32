@@ -18,18 +18,43 @@ void app_main()
      * Otherwise there can be problem such as memory corruption and so on.
      * NOTE: When not using Wi-Fi nor Bluetooth you can pin the guiTask to core 0 */
 
-    // Start LCD and backlight PWM
+    /**
+     * Setup and Start LCD
+     */
+    // Start LCD
     xTaskCreatePinnedToCore(runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
-    pwmControllerInit();
-    pwmControllerSet(0.05); // PWM signal for dimmed mode
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    pwmControllerSet(1); // PWM signal for bright mode
-    ui_ShakeLock_Animation(0);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    ui_Unlock();
-    ui_Welcome_Animation(500);
-    vTaskDelay(pdMS_TO_TICKS(6000));
-    ui_Lock();
-    ui_ShowKeypad_Animation(0);
-    ui_ShakeKeypad_Animation(1000);
+    pwmControllerInit();    // Setup pwm
+    pwmControllerSet(0.05); // Start with dimmed pwm
+
+    /**
+     * Setup and Start Wifi, along with Time
+     */
+    initialize_wifi();  // Setup wifi
+    nvs_flash_init();   // Setup non-volatile flash
+    esp_wifi_connect(); // Connect to wifi
+    initialize_sntp();  // Setup time server
+    update_time();      // Get time
+    wifi_ap_record_t wifi_info;
+
+    connected = esp_wifi_sta_get_ap_info(&wifi_info);
+
+    if (connected == ESP_OK)
+    {
+        if (wifi_info.rssi < -90)
+        {
+
+            ESP_LOGI("WEAK WIFI", "Weak Wi-Fi signal. Reconnecting...");
+
+            esp_wifi_disconnect();
+
+            vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for disconnection
+
+            esp_wifi_connect();
+        }
+    }
+    else
+    {
+
+        esp_wifi_connect();
+    }
 }
