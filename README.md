@@ -2,25 +2,155 @@
 
 All code in this Repository is to be flashed onto the microcontroller for working access.
 
-The WiFi folder contains code that will be used to connect the ESP32 to a WiFi network to enable IoT access.
-The TimeServer folder contains code used to get the time off a server.
-The esp32ToAwsHttp folder contains code to send messages from ESP32 to AWS IoT.
+Folder Heirarchy
+
+main\
+├─── aws\
+│ └─── aws_http\
+├─── screen\
+│ └─── screen_controller\
+├─── ui\
+│ ├─── animations\
+│ ├─── images\
+│ ├─── screens\
+│ └─── ui\
+├─── utils\
+│ ├─── wifi\
+│ ├─── pwm_controller\
+│ └─── ntp_time\
+└─── main
 
 ## Installation
 
 ### Prequisites
 
+- VSCode
+- Espressif IDF extension for VSCode
+- An ESP32 Microcontroller
+- Git
+
 ### Clone
+
+Clone this repository into your workspace.
+
+- Open a Terminal window
+- Run the follwing command
+
+```
+git clone https://
+```
 
 #### Add Submodule: lvgl
 
+This project depends upon lvgl v7.11.0 (git@b55ee6a).
+
+To add this library as a submodule:
+
+- Open a Terminal window
+- Run the follwing command
+
+```shell
+git submodule add -f https://github.com/lvgl/lvgl.git components/lvgl
+```
+
+Then go into the components/lvgl folder
+
+```shell
+cd ./components/lvgl
+```
+
+Finally, set git to use the correct version of lvgl with
+
+```shell
+git checkout b55ee6a
+```
+
 #### Add Submodule: lvgl_esp32_drivers
+
+This project depends upon lvgl_esp32_drivers (git@9fed1cc).
+
+To add this library as a submodule:
+
+- Open a Terminal window
+- Run the follwing command
+
+```shell
+git submodule add -f https://github.com/lvgl/lvgl_esp32_drivers.git components/lvgl_esp32_drivers
+```
+
+Then go into the components/lvgl_esp32_drivers folder
+
+```shell
+cd ./components/lvgl_esp32_drivers
+```
+
+Finally, set git to use the correct version of lvgl_esp32_drivers with
+
+```shell
+git checkout 9fed1cc
+```
 
 ### Build
 
+Open this folder in VSCode and enable the Espressif IDF extension.
+
+Connect your microcontroller and select the port. Then, within the ESP IDF Explorer tab, click `Connect your board first`.
+
+Once the microcontroller is connected to the extension, you can build then upload the code.
+
 ## LCD Screen
 
-> Coming Soon!
+Start the screen by running `runScreenGUI()` in a seperate thread by calling `xTaskCreatePinnedToCore`. Now any of these functions will works:
+
+`ui_init` Initialize the UI.\
+`ui_Unlock` Unlock the lock indicator icon.\
+`ui_Lock` Lock the lock indicator icon.\
+`ui_TimeAndIconsToTop_Animation` Run the animation move the lock icon and time label up to the top of the screen.\
+`ui_Welcome_Animation` Run the animation to go to welcome screen, and then back to normal.\
+`ui_ShowKeypad_Animation` Run the animation to show the keypad screen.\
+`ui_ShakeKeypad_Animation` Run the animation to shake the keypad rapidly.\
+`ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.\
+
+Full example going through all the animations:
+
+```C
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "screen/screen_controller.h"
+#include "utils/pwm_controller.h"
+#include "ui/ui.h"
+
+/**********************
+ *   APPLICATION MAIN
+ **********************/
+
+void app_main()
+{
+    // Start LCD and backlight PWM
+    xTaskCreatePinnedToCore(runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    pwmControllerInit();
+    pwmControllerSet(0.05); // PWM signal for dimmed mode
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    pwmControllerSet(1); // PWM signal for bright mode
+    ui_ShakeLock_Animation(0);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    ui_Unlock();
+    ui_Welcome_Animation(500);
+    vTaskDelay(pdMS_TO_TICKS(6000));
+    ui_Lock();
+    ui_ShowKeypad_Animation(0);
+    ui_ShakeKeypad_Animation(1000);
+}
+
+```
+
+## PWM for the LCD Screen's LED Backlight
+
+The PWM Controller file has definitions for pin (default 21:MISO), frequency (100KHz), duty resolution bits (5-bit), LEDC timer (1), and LEDC channel (1).\
+Use `pwmControllerInit()` to initialize LEDC and configure the duty resolution.\
+Use `pwmControllerSet(float percent_fraction)` to set the duty cycle. The function takes a float in the interval [0, 1]. 0 is off while 1 is max duty.
 
 ## Time
 
