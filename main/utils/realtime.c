@@ -10,7 +10,7 @@
 #include "ui/ui.h"
 
 /**
- * Private functions prototype
+ * Private function prototypes
  */
 /**
  * @brief
@@ -38,18 +38,53 @@ void runWifiTask()
 }
 void systemSleep() { pwmControllerSet(0.05); }
 void systemWake() { pwmControllerSet(1); }
-void updateWifiState() {}
+void updateWifiState()
+{
+    wifi_ap_record_t wifi_info;
+    esp_err_t connected = esp_wifi_sta_get_ap_info(&wifi_info);
+
+    if (connected == ESP_OK)
+    {
+        // Very low signal, attempt to reconnect
+        if (wifi_info.rssi < -90)
+        {
+            ui_SetWifiBarNumber(NoBars);
+            esp_wifi_disconnect();           // Disconnect
+            vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for disconnection
+            esp_wifi_connect();              // Reconnect
+        }
+        // Low signal, one bar
+        else if (wifi_info.rssi < -75)
+        {
+            ui_SetWifiBarNumber(OneBar);
+        }
+        // Two bars
+        else if (wifi_info.rssi < -50)
+        {
+            ui_SetWifiBarNumber(TwoBars);
+        }
+        // Three bars
+        else if (wifi_info.rssi <= 0)
+        {
+            ui_SetWifiBarNumber(ThreeBars);
+        }
+    }
+    else
+    {
+        esp_wifi_connect();
+    }
+}
 void checkAccess() {}
 
 /**
  * Private function implementations
  */
-static void _accessGranted()
+void _accessGranted()
 {
     ui_Unlock();
     ui_Welcome_Animation(500);
 }
-static void _accessDenied()
+void _accessDenied()
 {
     ui_Lock();
     ui_ShakeLock_Animation(0);

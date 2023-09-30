@@ -1,6 +1,6 @@
 /**
  * @file ui_MainScreen.c
- * Initialize all widgets, set their styles, and set their parent. Generates the screen that displays everything.
+ * Initialize all widgets, set their styles, and set their parent. Generates the screen that displays everything. Wifi bar getter and setter.
  */
 #include <string.h>
 #include "../ui.h"
@@ -181,6 +181,58 @@ void ui_MainScreen_screen_init(void)
     lv_obj_add_style(ui_PasscodeLabel, LV_OBJ_PART_MAIN, &text30StyleKP);
     lv_obj_align(ui_PasscodeLabel, NULL, LV_ALIGN_CENTER, 0, -1);
     lv_obj_set_auto_realign(ui_PasscodeLabel, true);
+}
+
+WifiBar ui_GetWifiBarNumber()
+{
+    if (!lv_obj_get_hidden(ui_WifiIcon1Bar))
+    {
+        return OneBar;
+    }
+    else if (!lv_obj_get_hidden(ui_WifiIcon2Bar))
+    {
+        return TwoBars;
+    }
+    else if (!lv_obj_get_hidden(ui_WifiIcon3Bar))
+    {
+        return ThreeBars;
+    }
+    else
+    {
+        return NoBars;
+    }
+}
+
+void ui_SetWifiBarNumber(WifiBar bar)
+{
+    if (ui_GetWifiBarNumber() == bar)
+    {
+        return;
+    }
+
+    switch (bar)
+    {
+    case OneBar:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, false);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        break;
+    case TwoBars:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, false);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        break;
+    case ThreeBars:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, false);
+        break;
+    default:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        break;
+    }
 }
 
 /*

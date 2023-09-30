@@ -22,6 +22,16 @@ extern "C"
     /**
      * @brief
      */
+    typedef enum _WifiBar
+    {
+        OneBar,
+        TwoBars,
+        ThreeBars,
+        NoBars
+    } WifiBar;
+    /**
+     * @brief
+     */
     void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
     /**
      * @brief
@@ -47,6 +57,14 @@ extern "C"
      * @brief
      */
     void ui_Lock();
+    /**
+     * @brief
+     */
+    WifiBar ui_GetWifiBarNumber();
+    /**
+     * @brief
+     */
+    void ui_SetWifiBarNumber(WifiBar bars);
     /**
      * @brief
      */

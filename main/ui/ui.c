@@ -12,6 +12,8 @@ void ui_ShowKeypad_Animation(int delay);
 void ui_ShakeKeypad_Animation(int delay);
 void ui_Unlock();
 void ui_Lock();
+WifiBar ui_GetWifiBarNumber();
+void ui_SetWifiBarNumber(WifiBar bars);
 void ui_ShakeLock_Animation(int delay);
 // SCREEN: ui_MainScreen
 void ui_MainScreen_screen_init(void);
