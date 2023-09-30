@@ -79,12 +79,12 @@ void checkAccess() {}
 /**
  * Private function implementations
  */
-void _accessGranted()
+static void _accessGranted()
 {
     ui_Unlock();
     ui_Welcome_Animation(500);
 }
-void _accessDenied()
+static void _accessDenied()
 {
     ui_Lock();
     ui_ShakeLock_Animation(0);

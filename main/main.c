@@ -22,8 +22,8 @@ void app_main()
     /**
      * Initialize all tools
      */
-    initialize_wifi();      // Setup wifi
-    nvs_flash_init();       // Setup non-volatile flash
+    initialize_wifi(); // Setup wifi
+    // nvs_flash_init();       // Setup non-volatile flash
     initialize_sntp();      // Setup time server
     pwmControllerInit();    // Setup pwm
     pwmControllerSet(0.05); // Start with dimmed pwm

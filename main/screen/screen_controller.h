@@ -2,13 +2,13 @@
  * @file screen_controller.h
  * ScreenController header file
  */
-#ifndef SCREEN_CONTROLLER_H
-#define SCREEN_CONTROLLER_H
+#ifndef _SCREEN_CONTROLLER_H
+#define _SCREEN_CONTROLLER_H
 
 /**
  * @brief Start LVGL, init drivers, and init UI. Then start the loop for the screen.
- * @param controller: (ScreenController *) ScreenController for for thread/task
+ * @param pvParamter: (ScreenController *) ScreenController for for thread/task
  */
 void runScreenGUI(void *pvParameter);
 
-#endif /* SCREEN_CONTROLLER_H */
+#endif /* _SCREEN_CONTROLLER_H */

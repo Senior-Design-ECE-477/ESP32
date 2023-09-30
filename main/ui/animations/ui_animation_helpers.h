@@ -2,8 +2,8 @@
  * @file ui_animation_helpers.h
  * Helpers for ui_animations. Contains callbacks for color and opacity changes for each style.
  */
-#ifndef UI_ANIMATION_HELPERS_H
-#define UI_ANIMATION_HELPERS_H
+#ifndef _UI_ANIMATION_HELPERS_H
+#define _UI_ANIMATION_HELPERS_H
 
 #include "../ui.h"
 
@@ -29,4 +29,4 @@ void _ui_anim_callback_set_text18top_opacity(lv_obj_t *obj, lv_anim_value_t valu
 void _ui_anim_callback_set_text_opacity(lv_obj_t *obj, lv_anim_value_t value);
 void _ui_anim_callback_set_keypad_opacity(lv_obj_t *obj, lv_anim_value_t value);
 
-#endif /* UI_ANIMATION_HELPERS_H */
+#endif /* _UI_ANIMATION_HELPERS_H */

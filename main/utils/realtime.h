@@ -2,8 +2,8 @@
  * @file realtime.h
  * All realtime or multi-component project-specific functions header file
  */
-#ifndef REALTIME_H
-#define REALTIME_H
+#ifndef _REALTIME_H
+#define _REALTIME_H
 
 /**
  * @brief
@@ -35,4 +35,4 @@ void systemWake();
  */
 void runWifiTask();
 
-#endif /* REALTIME_H */
+#endif /* _REALTIME_H */

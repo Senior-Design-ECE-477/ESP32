@@ -2,8 +2,8 @@
  * @file ui.h
  * Everything UI related header file
  */
-#ifndef _LCD1_UI_H
-#define _LCD1_UI_H
+#ifndef _LCD_UI_H
+#define _LCD_UI_H
 
 #ifdef __cplusplus
 extern "C"
@@ -20,7 +20,7 @@ extern "C"
 
 #define LV_SIZE_CONTENT 1
     /**
-     * @brief
+     * @brief Enum to determine the amount of bars. The four different wifi bar types: OneBar, TwoBars, ThreeBars, and NoBars
      */
     typedef enum _WifiBar
     {
@@ -123,4 +123,4 @@ extern "C"
 } /*extern "C"*/
 #endif
 
-#endif /* _LCD1_UI_H */
+#endif /* _LCD_UI_H */

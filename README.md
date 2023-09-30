@@ -31,21 +31,21 @@ To add this library as a submodule:
 - Open a Terminal window
 - Run the follwing command
 
-```shell
-git submodule add -f https://github.com/lvgl/lvgl.git components/lvgl
-```
+  ```shell
+  git submodule add -f https://github.com/lvgl/lvgl.git components/lvgl
+  ```
 
-Then go into the components/lvgl folder
+- Then go into the components/lvgl folder
 
-```shell
-cd ./components/lvgl
-```
+  ```shell
+  cd ./components/lvgl
+  ```
 
-Finally, set git to use the correct version of lvgl with
+- Finally, set git to use the correct version of lvgl with
 
-```shell
-git checkout b55ee6a
-```
+  ```shell
+  git checkout b55ee6a
+  ```
 
 #### Add Submodule: lvgl_esp32_drivers
 
@@ -56,29 +56,29 @@ To add this library as a submodule:
 - Open a Terminal window
 - Run the follwing command
 
-```shell
-git submodule add -f https://github.com/lvgl/lvgl_esp32_drivers.git components/lvgl_esp32_drivers
-```
+  ```shell
+  git submodule add -f https://github.com/lvgl/lvgl_esp32_drivers.git components/lvgl_esp32_drivers
+  ```
 
-Then go into the components/lvgl_esp32_drivers folder
+- Then go into the components/lvgl_esp32_drivers folder
 
-```shell
-cd ./components/lvgl_esp32_drivers
-```
+  ```shell
+  cd ./components/lvgl_esp32_drivers
+  ```
 
-Set git to use the correct version of lvgl_esp32_drivers with
+- Set git to use the correct version of lvgl_esp32_drivers with
 
-```shell
-git checkout 9fed1cc
-```
+  ```shell
+  git checkout 9fed1cc
+  ```
 
-Now move the ili9341.c file found in the same directory as this README, into `components/lvgl_esp32_driver/lvgl_tft`, replacing the file that is already there. This file has the follwing updates made to it to fix build errors.
+- Now move the `ili9341.c` file found in the same directory as this README, into `components/lvgl_esp32_driver/lvgl_tft`, replacing the file that is already there. This file has the follwing updates made to it to fix build errors.
 
-```C
-gpio_pad_select_gpio(...);   ->   esp_rom_gpio_pad_select_gpio(...);
+  ```C
+  gpio_pad_select_gpio(...);   ->   esp_rom_gpio_pad_select_gpio(...);
 
-portTICK_RATE_MS   ->   portTICK_PERIOD_MS
-```
+  portTICK_RATE_MS   ->   portTICK_PERIOD_MS
+  ```
 
 ### Config
 
