@@ -1,4 +1,7 @@
-
+/**
+ * @file ui_MainScreen.c
+ * Initialize all widgets, set their styles, and set their parent. Generates the screen that displays everything.
+ */
 #include <string.h>
 #include "../ui.h"
 

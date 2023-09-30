@@ -1,3 +1,7 @@
+/**
+ * @file ui.h
+ * Everything UI related header file
+ */
 #ifndef _LCD1_UI_H
 #define _LCD1_UI_H
 
@@ -15,15 +19,41 @@ extern "C"
 #endif
 
 #define LV_SIZE_CONTENT 1
-
+    /**
+     * @brief
+     */
     void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
+    /**
+     * @brief
+     */
     void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay);
+    /**
+     * @brief
+     */
     void ui_Welcome_Animation(int delay);
+    /**
+     * @brief
+     */
     void ui_ShowKeypad_Animation(int delay);
+    /**
+     * @brief
+     */
     void ui_ShakeKeypad_Animation(int delay);
+    /**
+     * @brief
+     */
     void ui_Unlock();
+    /**
+     * @brief
+     */
     void ui_Lock();
+    /**
+     * @brief
+     */
     void ui_ShakeLock_Animation(int delay);
+
+    /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
+
     // SCREEN: ui_MainScreen
     void ui_MainScreen_screen_init(void);
     extern lv_style_t colorPanelStyle;
@@ -64,10 +94,15 @@ extern "C"
     LV_IMG_DECLARE(ui_img_wifi_icon3_png); // assets\wifi_icon3.png
     LV_IMG_DECLARE(ui_img_lcd_bg1_png);    // assets\lcd_bg1.png
 
+    /* END INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
+
+    /**
+     * @brief
+     */
     void ui_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif
+#endif /* _LCD1_UI_H */

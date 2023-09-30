@@ -1,3 +1,7 @@
+/**
+ * @file ui.c
+ * Everything UI related definition and ui_init implementation file
+ */
 #include "ui.h"
 
 ///////////////////// VARIABLES ////////////////////

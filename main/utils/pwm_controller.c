@@ -1,3 +1,7 @@
+/**
+ * @file pwm_controller.c
+ * LED PWM controller implementation file
+ */
 #include <math.h>
 #include "driver/ledc.h"
 #include "esp_err.h"

@@ -5,7 +5,13 @@
 #ifndef PWM_CONTROLLER_H
 #define PWM_CONTROLLER_H
 
+/**
+ * @brief
+ */
 void pwmControllerInit(void);
+/**
+ * @brief
+ */
 void pwmControllerSet(float left_duty_fraction);
 
-#endif
+#endif /* PWM_CONTROLLER_H */
