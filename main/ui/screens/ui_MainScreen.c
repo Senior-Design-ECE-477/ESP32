@@ -132,6 +132,12 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_height(ui_WifiIcon3Bar, 32); /// 1
     lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
 
+    ui_WifiIconNoBar = lv_img_create(ui_ColorPanel);
+    lv_img_set_src(ui_WifiIconNoBar, &ui_img_wifi_icon0_png);
+    lv_obj_set_width(ui_WifiIconNoBar, 32);  /// 1
+    lv_obj_set_height(ui_WifiIconNoBar, 32); /// 1
+    lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
+
     ui_WelcomeLabel = lv_label_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_WelcomeLabel, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_WelcomeLabel, LV_SIZE_CONTENT); /// 1
@@ -216,21 +222,25 @@ void ui_SetWifiBarNumber(WifiBar bar)
         lv_obj_set_hidden(ui_WifiIcon1Bar, false);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
         break;
     case TwoBars:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, false);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
         break;
     case ThreeBars:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, false);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
         break;
     default:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, false);
         break;
     }
 }

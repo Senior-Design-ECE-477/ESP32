@@ -6,33 +6,39 @@
 #define _REALTIME_H
 
 /**
- * @brief
+ * @brief This is an event triggered by an interrupt when the user wakes the system
+ * by either entering a passcode or using a fingerprint. It will run the checkAccess
+ * function when an entry request is submitted.
  */
 void entryEventISR();
 
 /**
- * @brief
+ * @brief Update current wifi state. Set wifi indicator and check signal, if the
+ * signal is low, attempt to reconnect.
  */
 void updateWifiState();
 
 /**
- * @brief
+ * @brief This function will connect to AWS and check if the current user is allowed
+ * entry or not. This includes checking the passcode if given, checking the fingerprint,
+ * and checking the user’s permissions.
  */
 void checkAccess();
 
 /**
- * @brief
+ * @brief Set the system to sleep mode
  */
 void systemSleep();
 
 /**
- * @brief
+ * @brief Wake the system if in sleep mode
  */
 void systemWake();
 
 /**
- * @brief
+ * @brief Wifi function to be used as the loop in a thread for wifi and time updates.
+ * @param pvParamter: task parameter
  */
-void runWifiTask();
+void runWifiTask(void *pvParameter);
 
 #endif /* _REALTIME_H */

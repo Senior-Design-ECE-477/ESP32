@@ -18,9 +18,9 @@ Clone this repository into your workspace.
 - Open a Terminal window
 - Run the follwing command
 
-```
-git clone https://github.com/Senior-Design-ECE-477/ESP32.git
-```
+  ```
+  git clone https://github.com/Senior-Design-ECE-477/ESP32.git
+  ```
 
 #### Add Submodule: lvgl
 

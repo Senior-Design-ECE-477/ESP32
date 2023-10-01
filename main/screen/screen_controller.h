@@ -7,7 +7,7 @@
 
 /**
  * @brief Start LVGL, init drivers, and init UI. Then start the loop for the screen.
- * @param pvParamter: (ScreenController *) ScreenController for for thread/task
+ * @param pvParamter: task parameter
  */
 void runScreenGUI(void *pvParameter);
 

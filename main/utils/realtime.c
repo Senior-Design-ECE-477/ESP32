@@ -12,20 +12,25 @@
 /**
  * Private function prototypes
  */
+
 /**
- * @brief
+ * @brief This function is run when access is granted to the user.
+ * Status and user data on AWS will be updated, the lock unlocked, and
+ * the screen shows the welcome animation.
  */
 static void _accessGranted();
 /**
- * @brief
+ * @brief This function is run when access is not granted to the user.
+ * User data on AWS will be updated and the screen shows the shake animation.
  */
 static void _accessDenied();
 
 /**
  * Public functions
  */
+
 void entryEventISR() {}
-void runWifiTask()
+void runWifiTask(void *pvParameter)
 {
     while (0)
     {
@@ -79,6 +84,7 @@ void checkAccess() {}
 /**
  * Private function implementations
  */
+
 static void _accessGranted()
 {
     ui_Unlock();

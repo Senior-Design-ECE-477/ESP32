@@ -38,14 +38,13 @@ lv_obj_t *ui_AMPMLabel;
 lv_obj_t *ui_WifiIcon1Bar;
 lv_obj_t *ui_WifiIcon2Bar;
 lv_obj_t *ui_WifiIcon3Bar;
+lv_obj_t *ui_WifiIconNoBar;
 lv_obj_t *ui_WelcomeLabel;
 lv_obj_t *ui_FirstNameLabel;
 lv_obj_t *ui_LastNameLabel;
 lv_obj_t *ui_KeypadPanel;
 lv_obj_t *ui_PasscodeLabel;
 lv_obj_t *ui____initial_actions0;
-const lv_img_dsc_t *ui_imgset_lcd_bg[2] = {&ui_img_lcd_bg1_png, &ui_img_lcd_bg2_png};
-const lv_img_dsc_t *ui_imgset_wifi_icon[3] = {&ui_img_wifi_icon1_png, &ui_img_wifi_icon2_png, &ui_img_wifi_icon3_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
