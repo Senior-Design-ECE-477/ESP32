@@ -16,7 +16,4 @@ int giveAccess(char* str);
 esp_err_t client_event_post_handler(esp_http_client_event_handle_t evt);
 void post_rest_function();
 
-void send_data_to_s3(const char *data);
-esp_err_t http_event_handler(esp_http_client_event_t *evt);
-
 #endif
