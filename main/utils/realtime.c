@@ -2,6 +2,7 @@
  * @file realtime.c
  * All realtime or multi-component project-specific functions C implementation file
  */
+#include <time.h>
 #include "realtime.h"
 #include "screen/screen_controller.h"
 #include "utils/pwm_controller.h"
@@ -35,8 +36,9 @@ void runWifiTask(void *pvParameter)
     while (0)
     {
         vTaskDelay(pdMS_TO_TICKS(1000)); // Delay between checks
-        update_time();                   // Get time
         updateWifiState();               // Update wifi info
+        struct tm time_now = getTime();  // Get datetime
+        ui_UpdateDateTime(time_now);     // Update datetime on UI
     }
 
     vTaskDelete(NULL);

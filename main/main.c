@@ -6,8 +6,9 @@
 #include "utils/pwm_controller.h"
 #include "utils/ntp_time.h"
 #include "utils/wifi.h"
-#include "ui/ui.h"
+// #include "ui/ui.h"
 #include "utils/realtime.h"
+#include "nvs_flash.h"
 
 /**********************
  *   APPLICATION MAIN
@@ -22,8 +23,8 @@ void app_main()
     /**
      * Initialize all tools
      */
-    initialize_wifi(); // Setup wifi
-    // nvs_flash_init();       // Setup non-volatile flash
+    nvs_flash_init();       // Setup non-volatile flash
+    initialize_wifi();      // Setup wifi
     initialize_sntp();      // Setup time server
     pwmControllerInit();    // Setup pwm
     pwmControllerSet(0.05); // Start with dimmed pwm

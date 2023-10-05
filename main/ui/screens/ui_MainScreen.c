@@ -132,7 +132,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_height(ui_WifiIcon3Bar, 32); /// 1
     lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
 
-    ui_WifiIconNoBar = lv_img_create(ui_ColorPanel);
+    ui_WifiIconNoBar = lv_img_create(ui_ColorPanel, NULL);
     lv_img_set_src(ui_WifiIconNoBar, &ui_img_wifi_icon0_png);
     lv_obj_set_width(ui_WifiIconNoBar, 32);  /// 1
     lv_obj_set_height(ui_WifiIconNoBar, 32); /// 1
@@ -245,6 +245,18 @@ void ui_SetWifiBarNumber(WifiBar bar)
     }
 }
 
+void ui_UpdateDateTime(const struct tm time_info)
+{
+    char *time = malloc(sizeof(char) * 5);    // 00:00
+    time[0] = (time_info.tm_hour / 10) + '0'; // Tens hour
+    time[1] = (time_info.tm_hour % 10) + '0'; // Ones hour
+    time[2] = ':';                            // :
+    time[3] = (time_info.tm_min / 10) + '0';  // Tens min
+    time[4] = (time_info.tm_min % 10) + '0';  // Ones min
+
+    lv_label_set_text(ui_TimeLabel, time);
+    lv_label_set_text(ui_TopTimeLabel, time);
+}
 /*
 
 Animations:

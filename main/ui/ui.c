@@ -15,6 +15,7 @@ void ui_Lock();
 WifiBar ui_GetWifiBarNumber();
 void ui_SetWifiBarNumber(WifiBar bars);
 void ui_ShakeLock_Animation(int delay);
+void ui_UpdateDateTime(const struct tm time_info);
 // SCREEN: ui_MainScreen
 void ui_MainScreen_screen_init(void);
 lv_style_t colorPanelStyle;

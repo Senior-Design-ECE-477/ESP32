@@ -10,7 +10,9 @@ extern "C"
 {
 #endif
 
-    // #include "lvgl.h"
+#include <time.h>
+
+// #include "lvgl.h"
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -80,6 +82,12 @@ extern "C"
      * @param delay Delay before animation starts
      */
     void ui_ShakeLock_Animation(int delay);
+    /**
+     * @brief Set the text that displays time on the screen.
+     * @param time_info A struct of type tm that contains the current time info, must have
+     * day, month, year, hour, and minute
+     */
+    void ui_UpdateDateTime(const struct tm time_info);
 
     /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
