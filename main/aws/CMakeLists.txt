@@ -1,3 +1,3 @@
-# SET(SOURCES aws_http.c)
+SET(SOURCES aws_http.c)
 
-# add_library(aws ${SOURCES})
+add_library(aws ${SOURCES})
