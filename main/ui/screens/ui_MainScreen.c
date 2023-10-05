@@ -1,4 +1,7 @@
-
+/**
+ * @file ui_MainScreen.c
+ * Initialize all widgets, set their styles, and set their parent. Generates the screen that displays everything. Wifi bar getter and setter.
+ */
 #include <string.h>
 #include "../ui.h"
 
@@ -129,6 +132,12 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_height(ui_WifiIcon3Bar, 32); /// 1
     lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
 
+    ui_WifiIconNoBar = lv_img_create(ui_ColorPanel, NULL);
+    lv_img_set_src(ui_WifiIconNoBar, &ui_img_wifi_icon0_png);
+    lv_obj_set_width(ui_WifiIconNoBar, 32);  /// 1
+    lv_obj_set_height(ui_WifiIconNoBar, 32); /// 1
+    lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
+
     ui_WelcomeLabel = lv_label_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_WelcomeLabel, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_WelcomeLabel, LV_SIZE_CONTENT); /// 1
@@ -180,6 +189,74 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_auto_realign(ui_PasscodeLabel, true);
 }
 
+WifiBar ui_GetWifiBarNumber()
+{
+    if (!lv_obj_get_hidden(ui_WifiIcon1Bar))
+    {
+        return OneBar;
+    }
+    else if (!lv_obj_get_hidden(ui_WifiIcon2Bar))
+    {
+        return TwoBars;
+    }
+    else if (!lv_obj_get_hidden(ui_WifiIcon3Bar))
+    {
+        return ThreeBars;
+    }
+    else
+    {
+        return NoBars;
+    }
+}
+
+void ui_SetWifiBarNumber(WifiBar bar)
+{
+    if (ui_GetWifiBarNumber() == bar)
+    {
+        return;
+    }
+
+    switch (bar)
+    {
+    case OneBar:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, false);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
+        break;
+    case TwoBars:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, false);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
+        break;
+    case ThreeBars:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, false);
+        lv_obj_set_hidden(ui_WifiIconNoBar, true);
+        break;
+    default:
+        lv_obj_set_hidden(ui_WifiIcon1Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon2Bar, true);
+        lv_obj_set_hidden(ui_WifiIcon3Bar, true);
+        lv_obj_set_hidden(ui_WifiIconNoBar, false);
+        break;
+    }
+}
+
+void ui_UpdateDateTime(const struct tm time_info)
+{
+    char *time = malloc(sizeof(char) * 5);    // 00:00
+    time[0] = (time_info.tm_hour / 10) + '0'; // Tens hour
+    time[1] = (time_info.tm_hour % 10) + '0'; // Ones hour
+    time[2] = ':';                            // :
+    time[3] = (time_info.tm_min / 10) + '0';  // Tens min
+    time[4] = (time_info.tm_min % 10) + '0';  // Ones min
+
+    lv_label_set_text(ui_TimeLabel, time);
+    lv_label_set_text(ui_TopTimeLabel, time);
+}
 /*
 
 Animations:

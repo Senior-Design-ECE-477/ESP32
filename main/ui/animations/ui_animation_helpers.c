@@ -1,4 +1,7 @@
-
+/**
+ * @file ui_animations_helpers.c
+ * Implementation of helpers for ui_animations. Contains callbacks for color and opacity changes for each style.
+ */
 #include "ui_animation_helpers.h"
 
 // Lerp hex colors and get the value at a certain step

@@ -1,4 +1,7 @@
-
+/**
+ * @file ui_animations.c
+ * All animation functions C implementation file
+ */
 #include "../ui.h"
 #include "ui_animation_helpers.h"
 #include "freertos/FreeRTOS.h"
@@ -157,8 +160,8 @@ void ui_ShakeLock_Animation(int delay)
     lv_anim_set_var(&a, ui_LockIcon);
     lv_anim_set_time(&a, 30);
     lv_anim_set_values(&a, 88, 96);
-    lv_anim_set_playback_time(&a, 30);
-    lv_anim_set_repeat_count(&a, 15);
+    lv_anim_set_playback_time(&a, (int)(ANIM_DURATION_100MS / ANIM_SHAKE_REPETITIONS));
+    lv_anim_set_repeat_count(&a, ANIM_SHAKE_REPETITIONS);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }
@@ -244,8 +247,8 @@ void ui_ShakeKeypad_Animation(int delay)
     lv_anim_set_var(&a, ui_KeypadPanel);
     lv_anim_set_time(&a, 30);
     lv_anim_set_values(&a, initialX, initialX + 8);
-    lv_anim_set_playback_time(&a, 30);
-    lv_anim_set_repeat_count(&a, 15);
+    lv_anim_set_playback_time(&a, (int)(ANIM_DURATION_100MS / ANIM_SHAKE_REPETITIONS));
+    lv_anim_set_repeat_count(&a, ANIM_SHAKE_REPETITIONS);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }

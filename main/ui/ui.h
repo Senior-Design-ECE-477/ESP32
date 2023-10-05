@@ -1,12 +1,18 @@
-#ifndef _LCD1_UI_H
-#define _LCD1_UI_H
+/**
+ * @file ui.h
+ * Everything UI related header file
+ */
+#ifndef _LCD_UI_H
+#define _LCD_UI_H
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    // #include "lvgl.h"
+#include <time.h>
+
+// #include "lvgl.h"
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -15,15 +21,76 @@ extern "C"
 #endif
 
 #define LV_SIZE_CONTENT 1
-
+    /**
+     * @brief Enum to determine the amount of bars. The four different wifi bar types: OneBar, TwoBars, ThreeBars, and NoBars
+     */
+    typedef enum _WifiBar
+    {
+        OneBar,
+        TwoBars,
+        ThreeBars,
+        NoBars
+    } WifiBar;
+    /**
+     * @brief Animation to fade color from current to green
+     * @param TargetObject LVGL object to animate the color of
+     * @param delay Delay before animation starts
+     */
     void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
+    /**
+     * @brief Runs 500ms animation to fade away time text, fade in the time at the top
+     * and move while scaling the lock icon to the top left.
+     * @param delay Delay before animation starts
+     * @param reverse_delay Delay before animation starts playing backward, -1 for no playback
+     */
     void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay);
+    /**
+     * @brief Runs 4500ms animation that fades to a welcome screen and then
+     * back to the home screen.
+     * @param delay Delay before animation starts
+     */
     void ui_Welcome_Animation(int delay);
+    /**
+     * @brief Runs 500ms animation to fade in the keypad screen.
+     * @param delay Delay before animation starts
+     */
     void ui_ShowKeypad_Animation(int delay);
+    /**
+     * @brief Runs 100ms animation that shakes the keypad repeatedly.
+     * @param delay Delay before animation starts
+     */
     void ui_ShakeKeypad_Animation(int delay);
+    /**
+     * @brief Hides lock icon and shows unlock icon
+     */
     void ui_Unlock();
+    /**
+     * @brief Hides unlock icon and shows lock icon
+     */
     void ui_Lock();
+    /**
+     * @brief Get the current number of bars showing on the wifi indicator
+     */
+    WifiBar ui_GetWifiBarNumber();
+    /**
+     * @brief Set the current number of bars showing on the wifi indicator
+     * @param bars Number of bars to show. WifiBar types: OneBar, TwoBars, ThreeBars, or NoBars
+     */
+    void ui_SetWifiBarNumber(WifiBar bars);
+    /**
+     * @brief Runs 100ms animation that shakes the lock repeatedly.
+     * @param delay Delay before animation starts
+     */
     void ui_ShakeLock_Animation(int delay);
+    /**
+     * @brief Set the text that displays time on the screen.
+     * @param time_info A struct of type tm that contains the current time info, must have
+     * day, month, year, hour, and minute
+     */
+    void ui_UpdateDateTime(const struct tm time_info);
+
+    /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
+
     // SCREEN: ui_MainScreen
     void ui_MainScreen_screen_init(void);
     extern lv_style_t colorPanelStyle;
@@ -47,6 +114,7 @@ extern "C"
     extern lv_obj_t *ui_WifiIcon1Bar;
     extern lv_obj_t *ui_WifiIcon2Bar;
     extern lv_obj_t *ui_WifiIcon3Bar;
+    extern lv_obj_t *ui_WifiIconNoBar;
     extern lv_obj_t *ui_WelcomeLabel;
     extern lv_obj_t *ui_FirstNameLabel;
     extern lv_obj_t *ui_LastNameLabel;
@@ -62,12 +130,19 @@ extern "C"
     LV_IMG_DECLARE(ui_img_wifi_icon1_png); // assets\wifi_icon1.png
     LV_IMG_DECLARE(ui_img_wifi_icon2_png); // assets\wifi_icon2.png
     LV_IMG_DECLARE(ui_img_wifi_icon3_png); // assets\wifi_icon3.png
+    LV_IMG_DECLARE(ui_img_wifi_icon0_png); // assets\wifi_icon0.png
     LV_IMG_DECLARE(ui_img_lcd_bg1_png);    // assets\lcd_bg1.png
 
+    /* END INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
+
+    /**
+     * @brief Called by the edited runScreenGUI function. Initialized the GUI
+     * by creating the widget we defined in code. Also sets styles for the widgets.
+     */
     void ui_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif
+#endif /* _LCD_UI_H */
