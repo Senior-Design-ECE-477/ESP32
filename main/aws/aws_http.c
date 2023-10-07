@@ -1,5 +1,4 @@
 #include "aws_http.h"
-#include ".secret/credentials.h"
 
 /*
 The purpose of this is to check the returned message from AWS to see if the user is authorized.

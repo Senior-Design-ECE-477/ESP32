@@ -251,62 +251,57 @@ void ui_SetWifiBarNumber(WifiBar bar)
     }
 }
 
-void ui_UpdateDateTime(const struct tm time_info)
+void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
 {
-    char time[5] = "00:00"; // 00:00
+    char time[6] = "12:59\0"; // 00:00
+    char ampm[3] = "AM\0";
     // static const char *DAY_OF_WEEK[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     // static const char *MONTH[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-    time[0] = (time_info.tm_hour / 10) + '0'; // Tens hour
-    time[1] = (time_info.tm_hour % 10) + '0'; // Ones hour
-    time[2] = ':';                            // :
-    time[3] = (time_info.tm_min / 10) + '0';  // Tens min
-    time[4] = (time_info.tm_min % 10) + '0';  // Ones min
+    // Set first two character to hour value
+    if (twelve_hour & (time_info.tm_hour > 12))
+    {
+        time[0] = (abs(time_info.tm_hour - 12) / 10) + '0'; // Tens hour
+        time[1] = (abs(time_info.tm_hour - 12) % 10) + '0'; // Ones hour
+    }
+    else
+    {
+        time[0] = (time_info.tm_hour / 10) + '0'; // Tens hour
+        time[1] = (time_info.tm_hour % 10) + '0'; // Ones hour
+    }
+    // Set last two character to minute value
+    time[2] = ':';                           // :
+    time[3] = (time_info.tm_min / 10) + '0'; // Tens min
+    time[4] = (time_info.tm_min % 10) + '0'; // Ones min
 
-    if (lv_label_get_text(ui_TimeLabel) != time)
+    // Set set leading character to space if it is zero
+    if (time[0] == '0')
+    {
+        time[0] = '‎'; // 32 for space or zero-width: '[U+200E]'
+    }
+
+    // Edit time if time has changed
+    if (strcmp(lv_label_get_text(ui_TimeLabel), time) != 0)
     {
         lv_label_set_text(ui_TimeLabel, time);
         lv_label_set_text(ui_TopTimeLabel, time);
+
+        // Update AMPM Label
+        if (time_info.tm_hour > 11)
+        {
+            ampm[0] = 'P';
+        }
+        else
+        {
+            ampm[0] = 'A';
+        }
+        if (strcmp(lv_label_get_text(ui_AMPMLabel), ampm) != 0)
+        {
+            lv_label_set_text(ui_AMPMLabel, ampm);
+        }
 
         ESP_LOGI(TAG, "Time set to %s", time);
     }
 
     // free(time);
 }
-/*
-
-Animations:
-- Fade green
-- Fade red
-- Fade AMPM and Title labels
-- Fade Hello and Name labels
-- Move time and both lock images
-- Scale keypad box and text
-
-
-
-
-animation on unlock (1 second):
-
-step 1 (0.5s):
-background faded to green
-rock lock icon to the right by 45 degrees while also changing image to unlocked icon
-background faded to normal
-on the rock back to normal, move lock to top left and scale down to 1/2
-
-step 2 (0.5s):
-time label and ampm label scaled to 1/8 and moved to top middle
-
-step 2.1:
-title fades away
-hello label and first/last name labels fade in
-
-
-animation on fail (0.5 seconds):
-
-step 1 (0.5s):
-vibrate lock icon
-change background to red, then back to normal
-
-
-*/
