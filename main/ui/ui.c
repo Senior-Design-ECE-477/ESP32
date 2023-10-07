@@ -3,6 +3,7 @@
  * Everything UI related definition and ui_init implementation file
  */
 #include "ui.h"
+static const char *TAG = "ui";
 
 ///////////////////// VARIABLES ////////////////////
 void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);

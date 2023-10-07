@@ -1,6 +1,12 @@
 #ifndef _CERTS_H__
 #define _CERTS_H__
 
+/**
+ * Replace the default rsa key and access key user/pass with your own 
+ * 
+ * Rename this file to certificates.h
+*/
+
 #define cert_start "-----BEGIN CERTIFICATE-----\n" \
 "...\n" \
 "-----END CERTIFICATE-----\n"

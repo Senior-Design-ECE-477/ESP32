@@ -17,8 +17,11 @@ Clone this repository into your workspace.
 
 - Open a Terminal window
 - Run the follwing command
-
+  ```shell
+  git clone --recurse-submodules https://github.com/Senior-Design-ECE-477/ESP32.git
   ```
+  Or run this command to clone regularly, you will have to add the submodules yourself (shown below).
+  ```shell
   git clone https://github.com/Senior-Design-ECE-477/ESP32.git
   ```
 

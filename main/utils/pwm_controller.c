@@ -2,23 +2,8 @@
  * @file pwm_controller.c
  * LED PWM controller implementation file
  */
-#include <math.h>
-#include "driver/ledc.h"
-#include "esp_err.h"
-#include "driver/gpio.h"
-
 #include "pwm_controller.h"
-
-/**
- * 5 Bit duty resolution with 100,000 Hz frequency
- * chosen for no flickering and low eye strain
- **/
-#define LED_PWM_CHANNEL LEDC_CHANNEL_1
-#define LED_PWM_TIMER LEDC_TIMER_1
-#define LED_PWM_BIT_NUM LEDC_TIMER_5_BIT
-#define LED_PWM_FREQUENCY 100000
-
-#define LED_PWM_PIN GPIO_NUM_21
+static const char *TAG = "pwm";
 
 void pwmControllerInit(void)
 {
@@ -49,4 +34,5 @@ void pwmControllerSet(float percent_fraction)
 
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_HIGH_SPEED_MODE, LED_PWM_CHANNEL, duty_cycle));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_HIGH_SPEED_MODE, LED_PWM_CHANNEL));
+    ESP_LOGI(TAG, "PWM Duty set to %.00f percent: %d", percent_fraction * 100.0, (int)duty_cycle);
 }

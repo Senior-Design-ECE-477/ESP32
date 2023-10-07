@@ -8,24 +8,9 @@ struct tm getTime()
 {
     time_t now;
     struct tm ti;
-    static const char *DAY_OF_WEEK[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-    static const char *MONTH[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
     time(&now);
     localtime_r(&now, &ti);
-
-    // if (ti.tm_year + 1900 < 2000)
-    // {
-    //     printf("Syncing with Server...\n");
-    // }
-    // else
-    // {
-    //     printf("%d %d %d ", ti.tm_hour, ti.tm_min, ti.tm_sec);
-    //     printf(DAY_OF_WEEK[ti.tm_wday]);
-    //     printf(" %d ", ti.tm_mday);
-    //     printf(MONTH[ti.tm_mon]);
-    //     printf(" %d\n", ti.tm_year + 1900);
-    // }
 
     return ti;
 }

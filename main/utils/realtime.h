@@ -5,6 +5,15 @@
 #ifndef _REALTIME_H
 #define _REALTIME_H
 
+#include <time.h>
+#include "esp_log.h"
+
+#include "screen/screen_controller.h"
+#include "utils/pwm_controller.h"
+#include "utils/ntp_time.h"
+#include "utils/wifi.h"
+#include "ui/ui.h"
+
 /**
  * @brief This is an event triggered by an interrupt when the user wakes the system
  * by either entering a passcode or using a fingerprint. It will run the checkAccess

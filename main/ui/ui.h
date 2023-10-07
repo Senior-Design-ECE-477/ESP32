@@ -11,8 +11,8 @@ extern "C"
 #endif
 
 #include <time.h>
+#include "esp_log.h"
 
-// #include "lvgl.h"
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -21,7 +21,8 @@ extern "C"
 #endif
 
 #define LV_SIZE_CONTENT 1
-    /**
+
+        /**
      * @brief Enum to determine the amount of bars. The four different wifi bar types: OneBar, TwoBars, ThreeBars, and NoBars
      */
     typedef enum _WifiBar
