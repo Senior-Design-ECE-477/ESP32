@@ -1,0 +1,93 @@
+#include "sen14585.h"
+#include "debug.h"
+
+uint8_t data[12];
+
+// Initialization UART commands
+uint8_t init_cmd[]=                 {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01};
+uint8_t change_baud_cmd[]=          {0x55, 0xAA, 0x01, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x04, 0x00, 0xC7, 0x01};
+uint8_t light_on_cmd[]=             {0x55, 0xAA, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x12, 0x00, 0x13, 0x01};
+uint8_t light_off_cmd[]=            {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x00, 0x12, 0x01};
+// Fingerprint Enroll UART commands
+uint8_t enroll_start_cmd[] =        {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
+uint8_t enroll1_cmd[] =             {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23, 0x00, 0x23, 0x01};
+uint8_t enroll2_cmd[] =             {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x00, 0x24, 0x01};
+uint8_t enroll3_cmd[] =             {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x25, 0x00, 0x25, 0x01};
+
+//Utility UART commands
+uint8_t get_enroll_count_cmd[] =    {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x20, 0x01};
+uint8_t check_enrolled_cmd[] =      {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x21, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
+uint8_t is_press_finger[] =         {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x00, 0x26, 0x01};
+uint8_t delete_id_cmd[] =           {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
+uint8_t delete_all_cmd[] =          {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41, 0x00, 0x41, 0x01};
+uint8_t verify_cmd[] =              {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
+uint8_t identify_cmd[] =            {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x51, 0x00, 0x51, 0x01};
+uint8_t enter_standby_cmd[] =       {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF9, 0x00, 0xF9, 0x01};
+uint8_t close_cmd[] =               {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x02, 0x01};
+
+esp_err_t init_uart() {
+    /* Configure parameters of an UART driver,
+    * communication pins and install the driver */
+    uart_config_t uart_config = {
+    .baud_rate = 9600, //may need to decrease to 9600
+    .data_bits = UART_DATA_8_BITS,
+    .parity = UART_PARITY_DISABLE,
+    .stop_bits = UART_STOP_BITS_1,
+    .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+    };
+
+    const int buff_size = (1024 * 2);
+    QueueHandle_t uart_queue;
+
+    //Install UART driver, and get the queue.
+    uart_driver_install(UART_PORT_NUM, buff_size, buff_size, 10, &uart_queue, 0);
+    uart_param_config(UART_PORT_NUM, &uart_config);
+    //Set UART pins (using UART0 default pins ie no changes.)
+
+    uart_set_pin(UART_PORT_NUM, 8, 7, -1, -1);
+
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+    send_uart_command(init_cmd, data);
+    send_uart_command(change_baud_cmd, data);
+    uart_set_baudrate(UART_PORT_NUM, 115200);
+
+    return ESP_OK;
+}
+
+esp_err_t led_light_on(){
+    if(send_uart_command(light_on_cmd, data) != ESP_OK) return ESP_FAIL;
+    debug_print("Response", data);
+    return ESP_OK;
+}
+
+esp_err_t led_light_off(){
+    if(send_uart_command(light_off_cmd, data) != ESP_OK) return ESP_FAIL;
+    debug_print("Response", data);
+    return ESP_OK;
+}
+
+esp_err_t enroll_finger() {
+    return ESP_OK;
+}
+
+
+esp_err_t send_fingerprint_command(){
+    return ESP_OK;
+}
+
+int get_enroll_count(){
+    if(send_uart_command(get_enroll_count_cmd, data) != ESP_OK) return ESP_FAIL;
+
+    //From 4-7 is the number of fingerprints saved in system
+    int numFingers = get_parameter_value(data);                                         //////////////////////////////////////////////////////////////////////////
+
+    debug_print("Response", data);
+    return numFingers;
+}
+
+
+esp_err_t close_uart(){
+    if(send_uart_command(close_cmd, data) != ESP_OK) return ESP_FAIL;
+    return ESP_OK;
+}
