@@ -4,6 +4,7 @@
  */
 #include <string.h>
 #include "../ui.h"
+static const char *TAG = "ui";
 
 void ui_MainScreen_screen_init(void)
 {
@@ -131,12 +132,13 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_width(ui_WifiIcon3Bar, 32);  /// 1
     lv_obj_set_height(ui_WifiIcon3Bar, 32); /// 1
     lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
+    lv_obj_set_hidden(ui_WifiIcon2Bar, true);
 
     ui_WifiIconNoBar = lv_img_create(ui_ColorPanel, NULL);
     lv_img_set_src(ui_WifiIconNoBar, &ui_img_wifi_icon0_png);
     lv_obj_set_width(ui_WifiIconNoBar, 32);  /// 1
     lv_obj_set_height(ui_WifiIconNoBar, 32); /// 1
-    lv_obj_align(ui_WifiIcon3Bar, NULL, LV_ALIGN_CENTER, 94, -138);
+    lv_obj_align(ui_WifiIconNoBar, NULL, LV_ALIGN_CENTER, 94, -138);
 
     ui_WelcomeLabel = lv_label_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_WelcomeLabel, LV_SIZE_CONTENT);  /// 1
@@ -219,6 +221,7 @@ void ui_SetWifiBarNumber(WifiBar bar)
     switch (bar)
     {
     case OneBar:
+        ESP_LOGI(TAG, "OneBar");
         lv_obj_set_hidden(ui_WifiIcon1Bar, false);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
@@ -229,33 +232,46 @@ void ui_SetWifiBarNumber(WifiBar bar)
         lv_obj_set_hidden(ui_WifiIcon2Bar, false);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
+        ESP_LOGI(TAG, "TwoBars");
         break;
     case ThreeBars:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, false);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
+        ESP_LOGI(TAG, "ThreeBars");
         break;
     default:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, false);
+        ESP_LOGI(TAG, "NoBars");
         break;
     }
 }
 
 void ui_UpdateDateTime(const struct tm time_info)
 {
-    char *time = malloc(sizeof(char) * 5);    // 00:00
+    char time[5] = "00:00"; // 00:00
+    // static const char *DAY_OF_WEEK[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    // static const char *MONTH[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
     time[0] = (time_info.tm_hour / 10) + '0'; // Tens hour
     time[1] = (time_info.tm_hour % 10) + '0'; // Ones hour
     time[2] = ':';                            // :
     time[3] = (time_info.tm_min / 10) + '0';  // Tens min
     time[4] = (time_info.tm_min % 10) + '0';  // Ones min
 
-    lv_label_set_text(ui_TimeLabel, time);
-    lv_label_set_text(ui_TopTimeLabel, time);
+    if (lv_label_get_text(ui_TimeLabel) != time)
+    {
+        lv_label_set_text(ui_TimeLabel, time);
+        lv_label_set_text(ui_TopTimeLabel, time);
+
+        ESP_LOGI(TAG, "Time set to %s", time);
+    }
+
+    // free(time);
 }
 /*
 

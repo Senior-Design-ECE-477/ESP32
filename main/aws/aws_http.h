@@ -4,12 +4,10 @@
 #include <stdio.h>
 #include "esp_http_client.h"
 #include "esp_http_server.h"
-#include "certificates.h"
+#include ".secret/certificates.h"
 #include "esp_log.h"
 #include "utils/motor.h"
 #include "regex.h"
-
-#define HTTPURL // THE MQTT URL ENDPOINT DESCRIBED IN README.md
 
 int giveAccess(char *str);
 

@@ -2,36 +2,8 @@
  * @file screen_controller.c
  * ScreenController C file
  */
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_freertos_hooks.h"
-#include "freertos/semphr.h"
-#include "esp_system.h"
-#include "esp_timer.h"
-#include "esp_heap_caps.h"
-#include "driver/gpio.h"
-
-/* Littlevgl specific */
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
-
-#include "lvgl_helpers.h"
-// #include "lv_examples/src/lv_demo_widgets/lv_demo_widgets.h"
-
 #include "screen_controller.h"
-#include "ui/ui.h"
-
-#define TAG "demo"
-#define LV_TICK_PERIOD_MS 1
-// #define
+static const char *TAG = "screen";
 
 SemaphoreHandle_t xGuiSemaphore;
 
@@ -104,6 +76,7 @@ void runScreenGUI(void *pvParameter)
     lv_indev_drv_register(&indev_drv);
 #endif
 
+    ESP_LOGI(TAG, "Drivers and buffers initialized");
     /* Create and start a periodic timer interrupt to call lv_tick_inc */
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &_ticker,
@@ -111,12 +84,15 @@ void runScreenGUI(void *pvParameter)
     esp_timer_handle_t periodic_timer;
     ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
+    ESP_LOGI(TAG, "Timer initialized");
 
     /* Create the UI */
     ui_init();
     // lv_demo_widgets();
+    ESP_LOGI(TAG, "UI initialized");
 
     // Start loop
+    ESP_LOGI(TAG, "Starting screen loop");
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */

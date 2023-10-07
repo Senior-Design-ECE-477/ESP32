@@ -1,14 +1,14 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "nvs_flash.h"
+#include "esp_log.h"
 
 #include "screen/screen_controller.h"
 #include "utils/pwm_controller.h"
 #include "utils/ntp_time.h"
 #include "utils/wifi.h"
-// #include "ui/ui.h"
 #include "utils/realtime.h"
-#include "nvs_flash.h"
 
 /**********************
  *   APPLICATION MAIN
@@ -32,6 +32,8 @@ void app_main()
     /**
      * Start tasks
      */
+    ESP_LOGI("main", "Running Wifi Task");
     xTaskCreatePinnedToCore(runWifiTask, "wifi", 4096 * 2, NULL, 0, NULL, 0);
+    ESP_LOGI("main", "Running LCD Task");
     xTaskCreatePinnedToCore(runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
 }

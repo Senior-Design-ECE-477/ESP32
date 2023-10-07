@@ -5,6 +5,24 @@
 #ifndef _PWM_CONTROLLER_H
 #define _PWM_CONTROLLER_H
 
+#include <math.h>
+#include "driver/ledc.h"
+#include "esp_err.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+
+/**
+ * 5 Bit duty resolution with 100,000 Hz frequency
+ * chosen for no flickering and low eye strain
+ **/
+
+#define LED_PWM_CHANNEL LEDC_CHANNEL_1
+#define LED_PWM_TIMER LEDC_TIMER_1
+#define LED_PWM_BIT_NUM LEDC_TIMER_5_BIT
+#define LED_PWM_FREQUENCY 100000
+
+#define LED_PWM_PIN GPIO_NUM_21
+
 /**
  * @brief This function initializes the LEDC channel to a specified pin number
  * and configuration. Then the LEDC timer is configured and initialized.
