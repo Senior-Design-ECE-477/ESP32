@@ -22,7 +22,7 @@ extern "C"
 
 #define LV_SIZE_CONTENT 1
 
-        /**
+    /**
      * @brief Enum to determine the amount of bars. The four different wifi bar types: OneBar, TwoBars, ThreeBars, and NoBars
      */
     typedef enum _WifiBar
@@ -86,9 +86,10 @@ extern "C"
     /**
      * @brief Set the text that displays time on the screen.
      * @param time_info A struct of type tm that contains the current time info, must have
+     * @param twelve_hour True if time should be set using a 12-hour format, false for 24-hour format
      * day, month, year, hour, and minute
      */
-    void ui_UpdateDateTime(const struct tm time_info);
+    void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour);
 
     /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
@@ -137,7 +138,7 @@ extern "C"
     /* END INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
     /**
-     * @brief Called by the edited runScreenGUI function. Initialized the GUI
+     * @brief Called by the edited sc_runScreenGUI function. Initialized the GUI
      * by creating the widget we defined in code. Also sets styles for the widgets.
      */
     void ui_init(void);

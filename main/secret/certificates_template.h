@@ -4,7 +4,7 @@
 /**
  * Replace the default rsa key and access key user/pass with your own 
  * 
- * Rename this file to certificates.h
+ * Copy and Rename this file to certificates.h
 */
 
 #define cert_start "-----BEGIN CERTIFICATE-----\n" \

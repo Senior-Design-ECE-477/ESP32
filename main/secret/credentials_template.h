@@ -4,7 +4,7 @@
 /**
  * Replace the default wifi SSID and password and the api url with your own 
  * 
- * Rename this file to credentials.h
+ * Copy and Rename this file to credentials.h
 */
 
 #define WIFI_SSID     "wifi-name" // Your Wifi network's SSID

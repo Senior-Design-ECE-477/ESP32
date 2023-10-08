@@ -2,16 +2,20 @@
 #define _AWS_HTTP_H_
 
 #include <stdio.h>
+#include <math.h>
 #include "esp_http_client.h"
 #include "esp_http_server.h"
-#include ".secret/certificates.h"
 #include "esp_log.h"
+
 #include "utils/motor.h"
 #include "regex.h"
+#include "secret/credentials.h"
+#include "secret/certificates.h"
+
+#define MAX_HTTP_RESPONSE_SIZE 128
 
 int giveAccess(char *str);
 
-esp_err_t client_event_post_handler(esp_http_client_event_handle_t evt);
-void post_rest_function();
+char *aws_verify_user(int id);
 
 #endif

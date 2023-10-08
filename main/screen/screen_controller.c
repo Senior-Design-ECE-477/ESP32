@@ -13,10 +13,12 @@ static void _ticker(void *arg)
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
 
-void runScreenGUI(void *pvParameter)
+void sc_runScreenGUI(void *pvParameter)
 {
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
+
+    ESP_LOGI(TAG, "LCD task started");
 
     lv_init();
 

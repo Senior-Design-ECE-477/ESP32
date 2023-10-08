@@ -70,5 +70,5 @@ platformio.ini
 .vscode/
 
 # Secrets
-main/.secret/certificates.h
-main/.secret/credentials.h
+main/secret/credentials.h
+main/secret/certificates.h
