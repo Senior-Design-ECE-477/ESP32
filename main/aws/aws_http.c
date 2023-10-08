@@ -1,10 +1,14 @@
 #include "aws_http.h"
+char receive_buffer[MAX_HTTP_RESPONSE_SIZE];
+
+static esp_err_t _client_event_post_handler(esp_http_client_event_handle_t evt);
 
 /*
-The purpose of this is to check the returned message from AWS to see if the user is authorized.
+DEPRECATED: The purpose of this is to check the returned message from AWS to see if the user is authorized.
 */
 int giveAccess(char *str)
 {
+    // DEPRECATED FUNCTION see realtime.c
     regex_t regex;
     int return_value;
 
@@ -21,29 +25,17 @@ Modifications made by Thomas Wygal
 
 The purpose of this is to get the return from AWS and turn the motor on if verified correctly
 */
-esp_err_t client_event_post_handler(esp_http_client_event_handle_t evt)
+esp_err_t _client_event_post_handler(esp_http_client_event_handle_t evt)
 {
     switch (evt->event_id)
     {
     case HTTP_EVENT_ON_DATA:
         // This callback is invoked as data is received
+        // Copy results into buffer that will be returned
         printf("HTTP_EVENT_ON_DATA: %.*s\n", evt->data_len, (char *)evt->data);
-
-        // You can process the data here, but it's already a string, so no need to call .read()
-
-        if (giveAccess((char *)evt->data) == 0)
+        if (!esp_http_client_is_chunked_response(evt->client))
         {
-            ESP_LOGI("MOTOR", "UNLOCK");
-            motor_unlock();
-            sleep(3);
-            motor_off();
-            ESP_LOGI("MOTOR", "OFF");
-            sleep(5);
-            ESP_LOGI("MOTOR", "LOCKING");
-            motor_lock();
-            sleep(3);
-            ESP_LOGI("MOTOR", "OFF");
-            motor_off();
+            strncpy(receive_buffer, (char *)evt->data, evt->data_len);
         }
         break;
 
@@ -59,7 +51,7 @@ Modifications made by Thomas Wygal
 
 This code will send an HTTP GET to AWS API Gateway to be sent through a Lambda function before entering the database
 */
-void post_rest_function()
+char *aws_verify_user(int value)
 {
     esp_http_client_config_t config_post = {
         .url = VERIFY_USER_ENDPOINT,
@@ -67,14 +59,21 @@ void post_rest_function()
         .cert_pem = (const char *)cert_start,
         .client_cert_pem = (const char *)certificate_start,
         .client_key_pem = (const char *)private_start,
-        .event_handler = client_event_post_handler};
+        .event_handler = _client_event_post_handler};
     esp_http_client_handle_t client = esp_http_client_init(&config_post);
 
-    char *post_data = "{\"ID\": 3, \"LockName\": \"main-door\"}";
+    // EntryValue can be fingerprint ID or passcode
+    int num_chars_value = (int)((ceil(log10(value)) + 1) * sizeof(char));
+    int num_chars = num_chars_value + (42 * sizeof(char));
+    char post_data[num_chars];
+    snprintf(post_data, num_chars, "{\"EntryValue\": %d, \"LockName\": \"main-door\"}", value);
+
     esp_http_client_set_post_field(client, post_data, strlen(post_data));
     esp_http_client_set_header(client, "Content-Type", "application/json");
     esp_http_client_set_header(client, "x-api-key", API_TOKEN);
 
     esp_http_client_perform(client);
     esp_http_client_cleanup(client);
+
+    return receive_buffer;
 }

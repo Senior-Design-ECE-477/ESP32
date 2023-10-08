@@ -138,7 +138,7 @@ extern "C"
     /* END INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
     /**
-     * @brief Called by the edited runScreenGUI function. Initialized the GUI
+     * @brief Called by the edited sc_runScreenGUI function. Initialized the GUI
      * by creating the widget we defined in code. Also sets styles for the widgets.
      */
     void ui_init(void);
