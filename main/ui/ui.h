@@ -32,12 +32,14 @@ extern "C"
         ThreeBars,
         NoBars
     } WifiBar;
+
     /**
      * @brief Animation to fade color from current to green
      * @param TargetObject LVGL object to animate the color of
      * @param delay Delay before animation starts
      */
     void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
+
     /**
      * @brief Runs 500ms animation to fade away time text, fade in the time at the top
      * and move while scaling the lock icon to the top left.
@@ -45,44 +47,63 @@ extern "C"
      * @param reverse_delay Delay before animation starts playing backward, -1 for no playback
      */
     void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay);
+
     /**
      * @brief Runs 4500ms animation that fades to a welcome screen and then
      * back to the home screen.
      * @param delay Delay before animation starts
      */
     void ui_Welcome_Animation(int delay);
+
     /**
-     * @brief Runs 500ms animation to fade in the keypad screen.
+     * @brief Runs 750ms animation to fade in the keypad screen.
      * @param delay Delay before animation starts
      */
     void ui_ShowKeypad_Animation(int delay);
+
     /**
      * @brief Runs 100ms animation that shakes the keypad repeatedly.
      * @param delay Delay before animation starts
      */
     void ui_ShakeKeypad_Animation(int delay);
+
     /**
      * @brief Hides lock icon and shows unlock icon
      */
     void ui_Unlock();
+
     /**
      * @brief Hides unlock icon and shows lock icon
      */
     void ui_Lock();
-    /**
-     * @brief Get the current number of bars showing on the wifi indicator
-     */
-    WifiBar ui_GetWifiBarNumber();
-    /**
-     * @brief Set the current number of bars showing on the wifi indicator
-     * @param bars Number of bars to show. WifiBar types: OneBar, TwoBars, ThreeBars, or NoBars
-     */
-    void ui_SetWifiBarNumber(WifiBar bars);
+
     /**
      * @brief Runs 100ms animation that shakes the lock repeatedly.
      * @param delay Delay before animation starts
      */
     void ui_ShakeLock_Animation(int delay);
+
+    /**
+     * @brief Runs 500ms animation that changes keypad screen to home screen
+     */
+    void ui_KeypadToHome_Animation(int delay);
+
+    /**
+     * @brief Runs 4000ms animation that changes keypad screen to welcome screen, then to home screen
+     */
+    void ui_KeypadToWelcome_Animation(int delay);
+
+    /**
+     * @brief Get the current number of bars showing on the wifi indicator
+     */
+    WifiBar ui_GetWifiBarNumber();
+
+    /**
+     * @brief Set the current number of bars showing on the wifi indicator
+     * @param bars Number of bars to show. WifiBar types: OneBar, TwoBars, ThreeBars, or NoBars
+     */
+    void ui_SetWifiBarNumber(WifiBar bars);
+
     /**
      * @brief Set the text that displays time on the screen.
      * @param time_info A struct of type tm that contains the current time info, must have
@@ -90,6 +111,12 @@ extern "C"
      * day, month, year, hour, and minute
      */
     void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour);
+
+    /**
+     * @brief Set the name text of the label that appears on welcome screen.
+     * @param name A string to which the text will be set to
+     */
+    void ui_setName(char *name);
 
     /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
@@ -119,7 +146,7 @@ extern "C"
     extern lv_obj_t *ui_WifiIconNoBar;
     extern lv_obj_t *ui_WelcomeLabel;
     extern lv_obj_t *ui_FirstNameLabel;
-    extern lv_obj_t *ui_LastNameLabel;
+    // extern lv_obj_t *ui_LastNameLabel;
     extern lv_obj_t *ui_KeypadPanel;
     extern lv_obj_t *ui_PasscodeLabel;
     // Other

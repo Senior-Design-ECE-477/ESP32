@@ -8,7 +8,7 @@ DEPRECATED: The purpose of this is to check the returned message from AWS to see
 */
 int giveAccess(char *str)
 {
-    // DEPRECATED FUNCTION see realtime.c
+    // DEPRECATED FUNCTION see cafs.c
     regex_t regex;
     int return_value;
 

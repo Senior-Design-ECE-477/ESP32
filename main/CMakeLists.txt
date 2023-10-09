@@ -1,8 +1,8 @@
 file(GLOB_RECURSE SRC_UI ${CMAKE_SOURCE_DIR} "ui/*.c")
-file(GLOB_RECURSE SRC_SCREEN ${CMAKE_SOURCE_DIR} "screen/*.c")
+# file(GLOB_RECURSE SRC_CAFS ${CMAKE_SOURCE_DIR} "cafs/*.c")
 file(GLOB_RECURSE SRC_UTIL ${CMAKE_SOURCE_DIR} "utils/*.c")
 file(GLOB_RECURSE SRC_AWS ${CMAKE_SOURCE_DIR} "aws/*.c")
 
-idf_component_register(SRCS "main.c" ${SRC_UI} ${SRC_SCREEN} ${SRC_UTIL} ${SRC_AWS}
-                    INCLUDE_DIRS "." "secret" "ui" "screen" "utils" "aws"
+idf_component_register(SRCS "main.c" "cafs.c" ${SRC_UI} ${SRC_UTIL} ${SRC_AWS} #${SRC_CAFS}
+                    INCLUDE_DIRS "." "secret" "ui" "utils" "aws" #"cafs"
                     )

@@ -112,7 +112,7 @@ void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay)
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_set_var(&a, ui_LockIcon);
     lv_anim_set_time(&a, ANIM_DURATION_500MS);
-    lv_anim_set_values(&a, lv_obj_get_y(ui_LockIcon), -8);
+    lv_anim_set_values(&a, ICON_Y_CENTER, ICON_Y_TOPLEFT);
     if (reverse_delay >= 0)
     {
         lv_anim_set_playback_time(&a, ANIM_DURATION_500MS);
@@ -122,7 +122,7 @@ void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay)
 
     // Move x
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
-    lv_anim_set_values(&a, lv_obj_get_x(ui_LockIcon), -8);
+    lv_anim_set_values(&a, ICON_X_CENTER, ICON_X_TOPLEFT);
     lv_anim_start(&a);
 
     // Scale by 1/2
@@ -134,12 +134,12 @@ void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay)
     // Move y
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_set_var(&a, ui_UnlockIcon);
-    lv_anim_set_values(&a, lv_obj_get_y(ui_UnlockIcon), -8);
+    lv_anim_set_values(&a, ICON_Y_CENTER, ICON_Y_TOPLEFT);
     lv_anim_start(&a);
 
     // Move x
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
-    lv_anim_set_values(&a, lv_obj_get_x(ui_UnlockIcon), -8);
+    lv_anim_set_values(&a, ICON_X_CENTER, ICON_X_TOPLEFT);
     lv_anim_start(&a);
 
     // Scale by 1/2
@@ -174,7 +174,6 @@ void ui_Welcome_Animation(int delay)
     lv_anim_t a;
     lv_anim_init(&a);
 
-    // TEXT ANIM
     // Fade out title
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text18_opacity);
     lv_anim_set_var(&a, ui_TitleLabel);
@@ -182,7 +181,7 @@ void ui_Welcome_Animation(int delay)
     lv_anim_set_values(&a, 255, 0);
     lv_anim_set_delay(&a, delay + 250);
     lv_anim_set_playback_time(&a, ANIM_DURATION_500MS);
-    lv_anim_set_playback_delay(&a, 2500 + 250);
+    lv_anim_set_playback_delay(&a, delay + 2500 + 250);
     lv_anim_start(&a);
 
     // Fade in welcome
@@ -191,7 +190,7 @@ void ui_Welcome_Animation(int delay)
     lv_anim_set_time(&a, ANIM_DURATION_500MS);
     lv_anim_set_values(&a, 0, 255);
     lv_anim_set_playback_time(&a, ANIM_DURATION_250MS);
-    lv_anim_set_playback_delay(&a, 2500);
+    lv_anim_set_playback_delay(&a, delay + 2500);
     lv_anim_start(&a);
 
     // Fade in first name
@@ -199,9 +198,9 @@ void ui_Welcome_Animation(int delay)
     lv_anim_set_var(&a, ui_FirstNameLabel);
     lv_anim_start(&a);
 
-    // Fade in last name
-    lv_anim_set_var(&a, ui_LastNameLabel);
-    lv_anim_start(&a);
+    // // Fade in last name
+    // lv_anim_set_var(&a, ui_LastNameLabel);
+    // lv_anim_start(&a);
 }
 
 void ui_ShowKeypad_Animation(int delay)
@@ -232,6 +231,177 @@ void ui_ShowKeypad_Animation(int delay)
     // Fade in passcode label
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text30KP_opacity);
     lv_anim_set_var(&a, ui_PasscodeLabel);
+    lv_anim_start(&a);
+}
+
+void ui_KeypadToHome_Animation(int delay)
+{
+    // Init
+    lv_anim_t a;
+    lv_anim_init(&a);
+
+    // Fade out keypad
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_keypad_opacity);
+    lv_anim_set_var(&a, ui_KeypadPanel);
+    lv_anim_set_time(&a, ANIM_DURATION_250MS);
+    lv_anim_set_values(&a, 255, 0);
+    lv_anim_set_delay(&a, delay);
+    lv_anim_start(&a);
+
+    // Fade out passcode label
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text30KP_opacity);
+    lv_anim_set_var(&a, ui_PasscodeLabel);
+    lv_anim_start(&a);
+
+    // LOCK ICON ANIM
+    // Move y
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_var(&a, ui_LockIcon);
+    lv_anim_set_delay(&a, delay + 250);
+    lv_anim_set_values(&a, ICON_Y_TOPLEFT, ICON_Y_CENTER);
+    lv_anim_start(&a);
+
+    // Move x
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_values(&a, ICON_X_TOPLEFT, ICON_X_CENTER);
+    lv_anim_start(&a);
+
+    // Scale by 2
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_img_set_zoom);
+    lv_anim_set_values(&a, 128, 256);
+    lv_anim_start(&a);
+
+    // UNLOCK ICON ANIM
+    // Move y
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_var(&a, ui_UnlockIcon);
+    lv_anim_set_values(&a, ICON_Y_TOPLEFT, ICON_Y_CENTER);
+    lv_anim_start(&a);
+
+    // Move x
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_values(&a, ICON_X_TOPLEFT, ICON_X_CENTER);
+    lv_anim_start(&a);
+
+    // Scale by 2
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_img_set_zoom);
+    lv_anim_set_values(&a, 128, 256);
+    lv_anim_start(&a);
+
+    // Fade in big middle time
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text48_opacity);
+    lv_anim_set_var(&a, ui_TimeLabel);
+    lv_anim_set_values(&a, 0, 255);
+    lv_anim_start(&a);
+
+    // Fade in AMPM
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text_opacity);
+    lv_anim_set_var(&a, ui_AMPMLabel);
+    lv_anim_start(&a);
+
+    // Fade in title
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text18_opacity);
+    lv_anim_set_var(&a, ui_TitleLabel);
+    lv_anim_start(&a);
+
+    // Fade out small top time
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text18top_opacity);
+    lv_anim_set_var(&a, ui_TopTimeLabel);
+    lv_anim_set_values(&a, 255, 0);
+    lv_anim_start(&a);
+}
+
+void ui_KeypadToWelcome_Animation(int delay)
+{
+    // Init
+    lv_anim_t a;
+    lv_anim_init(&a);
+
+    // Fade out keypad
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_keypad_opacity);
+    lv_anim_set_var(&a, ui_KeypadPanel);
+    lv_anim_set_time(&a, ANIM_DURATION_250MS);
+    lv_anim_set_values(&a, 255, 0);
+    lv_anim_set_delay(&a, delay);
+    lv_anim_start(&a);
+
+    // Fade out passcode label
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text30KP_opacity);
+    lv_anim_set_var(&a, ui_PasscodeLabel);
+    lv_anim_start(&a);
+
+    // Fade in welcome
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text30_opacity);
+    lv_anim_set_var(&a, ui_WelcomeLabel);
+    lv_anim_set_time(&a, ANIM_DURATION_500MS);
+    lv_anim_set_values(&a, 0, 255);
+    lv_anim_set_delay(&a, delay + 250);
+    lv_anim_set_playback_time(&a, ANIM_DURATION_250MS);
+    lv_anim_set_playback_delay(&a, delay + 2500 + 250);
+    lv_anim_start(&a);
+
+    // Fade in first name
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text40_opacity);
+    lv_anim_set_var(&a, ui_FirstNameLabel);
+    lv_anim_start(&a);
+
+    // LOCK ICON ANIM
+    // Move y
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_var(&a, ui_LockIcon);
+    lv_anim_set_delay(&a, delay + 500 + 2500 + 250 + 250);
+    lv_anim_set_playback_time(&a, 0);
+    lv_anim_set_playback_delay(&a, 0);
+    lv_anim_set_values(&a, ICON_Y_TOPLEFT, ICON_Y_CENTER);
+    lv_anim_start(&a);
+
+    // Move x
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_values(&a, ICON_X_TOPLEFT, ICON_X_CENTER);
+    lv_anim_start(&a);
+
+    // Scale by 2
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_img_set_zoom);
+    lv_anim_set_values(&a, 128, 256);
+    lv_anim_start(&a);
+
+    // UNLOCK ICON ANIM
+    // Move y
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_var(&a, ui_UnlockIcon);
+    lv_anim_set_values(&a, ICON_Y_TOPLEFT, ICON_Y_CENTER);
+    lv_anim_start(&a);
+
+    // Move x
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_values(&a, ICON_X_TOPLEFT, ICON_X_CENTER);
+    lv_anim_start(&a);
+
+    // Scale by 2
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_img_set_zoom);
+    lv_anim_set_values(&a, 128, 256);
+    lv_anim_start(&a);
+
+    // Fade in big middle time
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text48_opacity);
+    lv_anim_set_var(&a, ui_TimeLabel);
+    lv_anim_set_values(&a, 0, 255);
+    lv_anim_start(&a);
+
+    // Fade in AMPM
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text_opacity);
+    lv_anim_set_var(&a, ui_AMPMLabel);
+    lv_anim_start(&a);
+
+    // Fade in title
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text18_opacity);
+    lv_anim_set_var(&a, ui_TitleLabel);
+    lv_anim_start(&a);
+
+    // Fade out small top time
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)_ui_anim_callback_set_text18top_opacity);
+    lv_anim_set_var(&a, ui_TopTimeLabel);
+    lv_anim_set_values(&a, 255, 0);
     lv_anim_start(&a);
 }
 
