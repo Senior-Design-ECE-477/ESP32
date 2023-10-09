@@ -68,14 +68,18 @@ void ui_MainScreen_screen_init(void)
     lv_img_set_src(ui_LockIcon, &ui_img_locked_png);
     lv_obj_set_width(ui_LockIcon, 64);  /// 1
     lv_obj_set_height(ui_LockIcon, 64); /// 1
-    lv_obj_align(ui_LockIcon, NULL, LV_ALIGN_CENTER, 0, -100);
+    lv_obj_set_x(ui_LockIcon, 88);
+    lv_obj_set_y(ui_LockIcon, 28);
+    // lv_obj_align(ui_LockIcon, NULL, LV_ALIGN_CENTER, 0, -100);
 
     ui_UnlockIcon = lv_img_create(ui_ColorPanel, NULL);
     lv_img_set_src(ui_UnlockIcon, &ui_img_unlocked_png);
     lv_obj_set_width(ui_UnlockIcon, 64);  /// 1
     lv_obj_set_height(ui_UnlockIcon, 64); /// 1
     lv_obj_set_hidden(ui_UnlockIcon, true);
-    lv_obj_align(ui_UnlockIcon, NULL, LV_ALIGN_CENTER, 0, -100);
+    lv_obj_set_x(ui_UnlockIcon, 88);
+    lv_obj_set_y(ui_UnlockIcon, 28);
+    // lv_obj_align(ui_UnlockIcon, NULL, LV_ALIGN_CENTER, 0, -100);
 
     ui_TimeLabel = lv_label_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_TimeLabel, LV_SIZE_CONTENT);  /// 1
@@ -144,9 +148,9 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_width(ui_WelcomeLabel, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_WelcomeLabel, LV_SIZE_CONTENT); /// 1
     lv_label_set_align(ui_WelcomeLabel, LV_LABEL_ALIGN_CENTER);
-    lv_label_set_text(ui_WelcomeLabel, "Welcome");
+    lv_label_set_text(ui_WelcomeLabel, "Welcome\nback");
     lv_obj_add_style(ui_WelcomeLabel, LV_OBJ_PART_MAIN, &text30Style);
-    lv_obj_align(ui_WelcomeLabel, NULL, LV_ALIGN_CENTER, 0, -75);
+    lv_obj_align(ui_WelcomeLabel, NULL, LV_ALIGN_CENTER, 0, -30);
     lv_obj_set_auto_realign(ui_WelcomeLabel, true);
 
     ui_FirstNameLabel = lv_label_create(ui_ColorPanel, NULL);
@@ -155,17 +159,17 @@ void ui_MainScreen_screen_init(void)
     lv_label_set_align(ui_FirstNameLabel, LV_LABEL_ALIGN_CENTER);
     lv_label_set_text(ui_FirstNameLabel, "Setul");
     lv_obj_add_style(ui_FirstNameLabel, LV_OBJ_PART_MAIN, &text40Style);
-    lv_obj_align(ui_FirstNameLabel, NULL, LV_ALIGN_CENTER, 0, 20);
+    lv_obj_align(ui_FirstNameLabel, NULL, LV_ALIGN_CENTER, 0, 50);
     lv_obj_set_auto_realign(ui_FirstNameLabel, true);
 
-    ui_LastNameLabel = lv_label_create(ui_ColorPanel, NULL);
-    lv_obj_set_width(ui_LastNameLabel, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_LastNameLabel, LV_SIZE_CONTENT); /// 1
-    lv_label_set_align(ui_LastNameLabel, LV_LABEL_ALIGN_CENTER);
-    lv_label_set_text(ui_LastNameLabel, "Parekh");
-    lv_obj_add_style(ui_LastNameLabel, LV_OBJ_PART_MAIN, &text40Style);
-    lv_obj_align(ui_LastNameLabel, NULL, LV_ALIGN_CENTER, 0, 60);
-    lv_obj_set_auto_realign(ui_LastNameLabel, true);
+    // ui_LastNameLabel = lv_label_create(ui_ColorPanel, NULL);
+    // lv_obj_set_width(ui_LastNameLabel, LV_SIZE_CONTENT);  /// 1
+    // lv_obj_set_height(ui_LastNameLabel, LV_SIZE_CONTENT); /// 1
+    // lv_label_set_align(ui_LastNameLabel, LV_LABEL_ALIGN_CENTER);
+    // lv_label_set_text(ui_LastNameLabel, "Parekh");
+    // lv_obj_add_style(ui_LastNameLabel, LV_OBJ_PART_MAIN, &text40Style);
+    // lv_obj_align(ui_LastNameLabel, NULL, LV_ALIGN_CENTER, 0, 60);
+    // lv_obj_set_auto_realign(ui_LastNameLabel, true);
 
     ui_KeypadPanel = lv_obj_create(ui_ColorPanel, NULL);
     lv_obj_set_width(ui_KeypadPanel, 200);
@@ -274,8 +278,14 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
     time[3] = (time_info.tm_min / 10) + '0'; // Tens min
     time[4] = (time_info.tm_min % 10) + '0'; // Ones min
 
+    // Set hour to 12 if 00
+    if ((time[0] == '0') & (time[1] == '0'))
+    {
+        time[0] = '1';
+        time[1] = '2';
+    }
     // Set set leading character to space if it is zero
-    if (time[0] == '0')
+    else if (time[0] == '0')
     {
         time[0] = '‎'; // 32 for space or zero-width: '[U+200E]'
     }
@@ -304,4 +314,9 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
     }
 
     // free(time);
+}
+
+void ui_setName(char *name)
+{
+    lv_label_set_text(ui_FirstNameLabel, name);
 }

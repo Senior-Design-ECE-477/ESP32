@@ -3,8 +3,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
-#include "screen/screen_controller.h"
-#include "utils/system.h"
+#include "cafs.h"
 
 /**********************
  *   APPLICATION MAIN
@@ -19,11 +18,11 @@ void app_main()
     /**
      * Initialize
      */
-    sys_initialize();
+    cafs_init();
 
     /**
      * Start tasks
      */
-    xTaskCreatePinnedToCore(sys_runWifiTask, "wifi", 4096 * 2, NULL, 0, NULL, 0);
-    xTaskCreatePinnedToCore(sc_runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreatePinnedToCore(cafs_runMainTask, "maintask", 4096 * 2, NULL, 0, NULL, 0);
+    xTaskCreatePinnedToCore(cafs_runScreenGUI, "guitask", 4096 * 2, NULL, 0, NULL, 1);
 }

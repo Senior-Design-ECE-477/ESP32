@@ -75,13 +75,13 @@ To add this library as a submodule:
   git checkout 9fed1cc
   ```
 
-- Now move the `ili9341.c` file found in the same directory as this README, into `components/lvgl_esp32_driver/lvgl_tft`, replacing the file that is already there. This file has the follwing updates made to it to fix build errors.
+### ili9341.c
 
-  ```C
-  gpio_pad_select_gpio(...);   ->   esp_rom_gpio_pad_select_gpio(...);
+Find the `ili9341.c` file in `components/lvgl_esp32_driver/lvgl_tft`. This file needs the follwing updates made to it to fix build errors.
 
-  portTICK_RATE_MS   ->   portTICK_PERIOD_MS
-  ```
+1. `gpio_pad_select_gpio` needs to be changed to `esp_rom_gpio_pad_select_gpio`;
+
+2. `portTICK_RATE_MS` needs to be changed to `portTICK_PERIOD_MS`
 
 ### Config
 
@@ -90,6 +90,12 @@ Scroll down to lvgl configuration and make sure driver is set to ILI9341.\
 Also set pin configuration here.
 
 A sample sdkconfig file is provided for ESP32 Feather V2.
+
+Options changed from default:
+
+| Name                       | Default | Changed to |
+| -------------------------- | ------- | ---------- |
+| LVGL Minimal Configuration | false   | true       |
 
 ### Build
 
@@ -108,7 +114,7 @@ Use `pwmControllerSet(float percent_fraction)` to set the duty cycle. The functi
 ```C
 pwmControllerInit();     // Initialize PWM LEDC channel and timer
 pwmControllerSet(0.05);  // PWM signal for dimmed mode
-pwmControllerSet(1);     // PWM signal for bright mode
+pwmControllerSet(0.95);  // PWM signal for bright mode
 ```
 
 ## LCD Screen
@@ -123,6 +129,12 @@ Start the screen by running `runScreenGUI()` in a seperate thread by calling `xT
 `ui_ShowKeypad_Animation` Run the animation to show the keypad screen.\
 `ui_ShakeKeypad_Animation` Run the animation to shake the keypad rapidly.\
 `ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.
+`ui_KeypadToHome_Animation` Run the animation to go from keypad screen to home screen\
+`ui_KeypadToWelcome_Animation` Run the animation to go from keypad screen to welcome screen and then to home screen\
+`ui_GetWifiBarNumber` Get current number of wifi bars displayed through enum WifiBars\
+`ui_SetWifiBarNumber` Set current number of wifi bars displayed through enum WifiBars\
+`ui_UpdateDateTime` Update the current time displayed to passed in time\
+`ui_setName` Set the name that appears on the welcome screen
 
 Full example going through all the animations and PWM.
 
@@ -131,7 +143,7 @@ Full example going through all the animations and PWM.
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "screen/screen_controller.h"
+#include "cafs.h"
 #include "utils/pwm_controller.h"
 #include "ui/ui.h"
 
@@ -142,11 +154,11 @@ Full example going through all the animations and PWM.
 void app_main()
 {
     // Start LCD and backlight PWM
-    xTaskCreatePinnedToCore(runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreatePinnedToCore(cafs_runScreenGUI, "gui", 4096 * 2, NULL, 0, NULL, 1);
     pwmControllerInit();
     pwmControllerSet(0.05); // PWM signal for dimmed mode
     vTaskDelay(pdMS_TO_TICKS(5000));
-    pwmControllerSet(1); // PWM signal for bright mode
+    pwmControllerSet(0.95); // PWM signal for bright mode
     ui_ShakeLock_Animation(0);
     vTaskDelay(pdMS_TO_TICKS(1000));
     ui_Unlock();
@@ -155,6 +167,12 @@ void app_main()
     ui_Lock();
     ui_ShowKeypad_Animation(0);
     ui_ShakeKeypad_Animation(1000);
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    ui_KeypadToHome_Animation(10);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    ui_ShowKeypad_Animation(0);
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    ui_KeypadToWelcome_Animation(10);
 }
 
 ```
