@@ -7,7 +7,6 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 
-#include "utils/motor.h"
 #include "regex.h"
 #include "secret/credentials.h"
 #include "secret/certificates.h"

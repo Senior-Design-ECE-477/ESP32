@@ -1,4 +1,5 @@
 #include "aws_http.h"
+static const char *TAG = "aws";
 char receive_buffer[MAX_HTTP_RESPONSE_SIZE];
 
 static esp_err_t _client_event_post_handler(esp_http_client_event_handle_t evt);
@@ -32,7 +33,7 @@ esp_err_t _client_event_post_handler(esp_http_client_event_handle_t evt)
     case HTTP_EVENT_ON_DATA:
         // This callback is invoked as data is received
         // Copy results into buffer that will be returned
-        printf("HTTP_EVENT_ON_DATA: %.*s\n", evt->data_len, (char *)evt->data);
+        ESP_LOGW(TAG, "HTTP_EVENT_ON_DATA: %.*s", evt->data_len, (char *)evt->data);
         if (!esp_http_client_is_chunked_response(evt->client))
         {
             strncpy(receive_buffer, (char *)evt->data, evt->data_len);
@@ -63,7 +64,15 @@ char *aws_verify_user(int value)
     esp_http_client_handle_t client = esp_http_client_init(&config_post);
 
     // EntryValue can be fingerprint ID or passcode
-    int num_chars_value = (int)((ceil(log10(value)) + 1) * sizeof(char));
+    int num_chars_value;
+    if (value == 0)
+    {
+        num_chars_value = 1;
+    }
+    else
+    {
+        num_chars_value = (int)((ceil(log10(value)) + 1) * sizeof(char));
+    }
     int num_chars = num_chars_value + (42 * sizeof(char));
     char post_data[num_chars];
     snprintf(post_data, num_chars, "{\"EntryValue\": %d, \"LockName\": \"main-door\"}", value);

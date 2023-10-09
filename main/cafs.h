@@ -27,6 +27,7 @@
 #include "utils/pwm_controller.h"
 #include "utils/ntp_time.h"
 #include "aws/aws_http.h"
+#include "utils/motor.h"
 #include "utils/wifi.h"
 #include "ui/ui.h"
 
@@ -43,6 +44,7 @@
 //-- Define --//
 ////////////////
 #define LV_TICK_PERIOD_MS 1
+#define CAFS_DELAY_TICKS 1 // 1 tick = portTICK_PERIOD_MS = 10ms
 
 ////////////////////////////////////
 //-- Public function prototypes --//
@@ -52,13 +54,6 @@
  * @brief This function will initialize the whole CAFS system including Wifi, Time, PWM, etc.
  */
 void cafs_init();
-
-/**
- * @brief This is an event triggered by an interrupt when the user wakes the system
- * by either entering a passcode or using a fingerprint. It will run the cafs_checkAccess
- * function when an entry request is submitted.
- */
-void cafs_entryEventISR();
 
 /**
  * @brief Update current wifi state. Set wifi indicator and check signal, if the

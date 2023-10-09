@@ -225,7 +225,7 @@ void ui_SetWifiBarNumber(WifiBar bar)
     switch (bar)
     {
     case OneBar:
-        ESP_LOGI(TAG, "OneBar");
+        ESP_LOGW(TAG, "OneBar");
         lv_obj_set_hidden(ui_WifiIcon1Bar, false);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
@@ -236,21 +236,21 @@ void ui_SetWifiBarNumber(WifiBar bar)
         lv_obj_set_hidden(ui_WifiIcon2Bar, false);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
-        ESP_LOGI(TAG, "TwoBars");
+        ESP_LOGW(TAG, "TwoBars");
         break;
     case ThreeBars:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, false);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
-        ESP_LOGI(TAG, "ThreeBars");
+        ESP_LOGW(TAG, "ThreeBars");
         break;
     default:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, false);
-        ESP_LOGI(TAG, "NoBars");
+        ESP_LOGW(TAG, "NoBars");
         break;
     }
 }
@@ -310,7 +310,7 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
             lv_label_set_text(ui_AMPMLabel, ampm);
         }
 
-        ESP_LOGI(TAG, "Time set to %s", time);
+        ESP_LOGW(TAG, "Time set to %s", time);
     }
 
     // free(time);
@@ -318,5 +318,9 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
 
 void ui_setName(char *name)
 {
-    lv_label_set_text(ui_FirstNameLabel, name);
+    if (strcmp(lv_label_get_text(ui_FirstNameLabel), name) != 0)
+    {
+        lv_label_set_text(ui_FirstNameLabel, name);
+        ESP_LOGW(TAG, "Name changed to %s", name);
+    }
 }

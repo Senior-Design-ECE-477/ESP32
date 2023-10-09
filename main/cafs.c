@@ -13,10 +13,20 @@
 ///////////////////
 static const char *TAG = "cafs";
 SemaphoreHandle_t xGuiSemaphore;
+SemaphoreHandle_t xInterruptSemaphore;
 
 /////////////////////////////////////
 //-- Private function prototypes --//
 /////////////////////////////////////
+
+/**
+ * @brief Interrupt Service Routine handler function for the even an entry is requested.
+ * This function is declared as IRAM_ATTR. This is an event triggered by an interrupt when
+ * the user wakes the system by either entering a passcode or using a fingerprint. It will
+ * run the cafs_checkAccess function when an entry request is submitted.
+ * @param arg
+ */
+static void IRAM_ATTR _entryEventISR_handler(void *arg);
 
 /**
  * @brief This function is run when access is granted to the user.
@@ -25,6 +35,7 @@ SemaphoreHandle_t xGuiSemaphore;
  * @param username The name of the user that was granted access
  */
 static void _accessGranted(char *username);
+
 /**
  * @brief This function is run when access is not granted to the user.
  * User data on AWS will be updated and the screen shows the shake animation.
@@ -49,16 +60,19 @@ void cafs_init()
     pwm_ControllerSet(0.95); // Start with dimmed pwm
 
     // Setul's test setup
-    // esp_rom_gpio_pad_select_gpio(13);
-    // gpio_set_direction(13, GPIO_MODE_OUTPUT);
-    // gpio_set_level(13, 1);
+    // pin 32 is set to button input for ISR
+    // pin 14 is for button input for aws call
+
     // esp_rom_gpio_pad_select_gpio(14);
     // gpio_set_direction(14, GPIO_MODE_INPUT);
     // esp_rom_gpio_pad_select_gpio(32);
     // gpio_set_direction(32, GPIO_MODE_INPUT);
+
+    // gpio_set_intr_type(32, GPIO_INTR_POSEDGE);
+    // gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
+    // gpio_isr_handler_add(32, _entryEventISR_handler, NULL);
 }
 
-void cafs_entryEventISR() {}
 // Sleep modes:
 // https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html
 void cafs_systemSleep() { pwm_ControllerSet(0.05); }
@@ -94,6 +108,7 @@ void cafs_checkAccess(int value)
     int return_value;
 
     char *api_result = aws_verify_user(value);
+    ESP_LOGI(TAG, "API RESULT: %s", api_result);
 
     return_value = regcomp(&regex, "UNLOCKED", 0);
     return_value = regexec(&regex, api_result, 0, NULL, 0);
@@ -111,13 +126,16 @@ void cafs_checkAccess(int value)
 
 void cafs_runMainTask(void *pvParameter)
 {
+    (void)pvParameter;
+    xInterruptSemaphore = xSemaphoreCreateBinary();
+
     ESP_LOGI(TAG, "Main task started");
-    uint8_t count = 0; // Max number of 256
-    uint8_t id = 3;
+
+    uint16_t count = 0;
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(20)); // Delay between checks
-        if (count >= 250)              // Every 20ms * 250 = 5000ms
+        vTaskDelay(pdMS_TO_TICKS(CAFS_DELAY_TICKS * portTICK_PERIOD_MS)); // Delay of 1 tick = 10ms = 1000ms / 10ms = 100 calls/s
+        if (count >= 500)                                                 // Every 10ms * 500 = 5000ms
         {
             cafs_updateWifiState();            // Update wifi info
             struct tm time_now = getTime();    // Get datetime
@@ -128,16 +146,18 @@ void cafs_runMainTask(void *pvParameter)
         {
             count++;
         }
+
+        if (pdTRUE == xSemaphoreTake(xInterruptSemaphore, 0))
+        {
+            // do interuppt stuff
+            ESP_LOGW(TAG, "ISR: Method not implemented");
+        }
+
         // Setul's test setup
+
         // if (gpio_get_level(14) == 1)
         // {
-        //     cafs_checkAccess(id);
-        // }
-        // if (gpio_get_level(32) == 1)
-        // {
-        //     ui_ShowKeypad_Animation(0);
-        //     vTaskDelay(pdMS_TO_TICKS(2000));
-        //     ui_KeypadToWelcome_Animation(10);
+        //     cafs_checkAccess(0);
         // }
     }
 
@@ -152,33 +172,18 @@ void cafs_runScreenGUI(void *pvParameter)
     ESP_LOGI(TAG, "LCD task started");
 
     lv_init();
-
     /* Initialize SPI or I2C bus used by the drivers */
     lvgl_driver_init();
 
     lv_color_t *buf1 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf1 != NULL);
-
-    /* Use double buffered when not working with monochrome displays */
-    // #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     lv_color_t *buf2 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf2 != NULL);
-    // #else
-    //     static lv_color_t *buf2 = NULL;
-    // #endif
 
     static lv_disp_buf_t disp_buf;
-
     uint32_t size_in_px = DISP_BUF_SIZE;
 
-    // #if defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_IL3820 || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_JD79653A || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_UC8151D || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_SSD1306
-
-    //     /* Actual size in pixels, not bytes. */
-    //     size_in_px *= 8;
-    // #endif
-
-    /* Initialize the working buffer depending on the selected display.
-     * NOTE: buf2 == NULL when using monochrome displays. */
+    /* Initialize the working buffer. */
     lv_disp_buf_init(&disp_buf, buf1, buf2, size_in_px);
 
     lv_disp_drv_t disp_drv;
@@ -189,25 +194,8 @@ void cafs_runScreenGUI(void *pvParameter)
     disp_drv.rotated = 1;
 #endif
 
-    /* When using a monochrome display we need to register the callbacks:
-     * - rounder_cb
-     * - set_px_cb */
-    // #ifdef CONFIG_LV_TFT_DISPLAY_MONOCHROME
-    //     disp_drv.rounder_cb = disp_driver_rounder;
-    //     disp_drv.set_px_cb = disp_driver_set_px;
-    // #endif
-
     disp_drv.buffer = &disp_buf;
     lv_disp_drv_register(&disp_drv);
-
-    //     /* Register an input device when enabled on the menuconfig */
-    // #if CONFIG_LV_TOUCH_CONTROLLER != TOUCH_CONTROLLER_NONE
-    //     lv_indev_drv_t indev_drv;
-    //     lv_indev_drv_init(&indev_drv);
-    //     indev_drv.read_cb = touch_driver_read;
-    //     indev_drv.type = LV_INDEV_TYPE_POINTER;
-    //     lv_indev_drv_register(&indev_drv);
-    // #endif
 
     ESP_LOGI(TAG, "Drivers and buffers initialized");
     /* Create and start a periodic timer interrupt to call lv_tick_inc */
@@ -221,7 +209,6 @@ void cafs_runScreenGUI(void *pvParameter)
 
     /* Create the UI */
     ui_init();
-    // lv_demo_widgets();
     ESP_LOGI(TAG, "UI initialized");
 
     // Start loop
@@ -229,7 +216,7 @@ void cafs_runScreenGUI(void *pvParameter)
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(portTICK_PERIOD_MS));
 
         /* Try to take the semaphore, call lvgl related function on success */
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
@@ -241,15 +228,18 @@ void cafs_runScreenGUI(void *pvParameter)
 
     /* A task should NEVER return */
     free(buf1);
-    // #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     free(buf2);
-    // #endif
     vTaskDelete(NULL);
 }
 
 ///////////////////////////
 //-- Private functions --//
 ///////////////////////////
+
+void _entryEventISR_handler(void *arg)
+{
+    xSemaphoreGiveFromISR(xInterruptSemaphore, NULL);
+}
 
 void _accessGranted(char *username)
 {

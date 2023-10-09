@@ -79,9 +79,16 @@ To add this library as a submodule:
 
 Find the `ili9341.c` file in `components/lvgl_esp32_driver/lvgl_tft`. This file needs the follwing updates made to it to fix build errors.
 
-1. `gpio_pad_select_gpio` needs to be changed to `esp_rom_gpio_pad_select_gpio`;
+1. `gpio_pad_select_gpio` needs to be changed to `esp_rom_gpio_pad_select_gpio`
 
 2. `portTICK_RATE_MS` needs to be changed to `portTICK_PERIOD_MS`
+
+### Secret
+
+The secret folder contains credentials and certificates. Make sure to fill it out with your secret values by doing the following:
+
+- Within the template files, there are instructions to copy the template file within the same directory, and rename the file to remove the `_template` part of the filename.
+- Then change the definitions in the files to your secret values.
 
 ### Config
 
@@ -128,9 +135,9 @@ Start the screen by running `runScreenGUI()` in a seperate thread by calling `xT
 `ui_Welcome_Animation` Run the animation to go to welcome screen, and then back to normal.\
 `ui_ShowKeypad_Animation` Run the animation to show the keypad screen.\
 `ui_ShakeKeypad_Animation` Run the animation to shake the keypad rapidly.\
-`ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.
+`ui_ShakeLock_Animation` Run the animation to shake the lock icon rapidly.\
 `ui_KeypadToHome_Animation` Run the animation to go from keypad screen to home screen\
-`ui_KeypadToWelcome_Animation` Run the animation to go from keypad screen to welcome screen and then to home screen\
+`ui_KeypadToWelcome_Animation` Run the animation to go from keypad screen to welcome animation\
 `ui_GetWifiBarNumber` Get current number of wifi bars displayed through enum WifiBars\
 `ui_SetWifiBarNumber` Set current number of wifi bars displayed through enum WifiBars\
 `ui_UpdateDateTime` Update the current time displayed to passed in time\
