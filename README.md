@@ -98,28 +98,45 @@ Also set pin configuration here.
 
 A sample sdkconfig file is provided for ESP32 Feather V2.
 
-Options changed from default:
+#### Options changed from default:
 
-| Section                                          | Name                                    | Default                      | Changed to                 |
-| ------------------------------------------------ | --------------------------------------- | ---------------------------- | -------------------------- |
-| Serial flasher config                            | Flash size                              | 2 MB                         | 4MB                        |
-| Partition Table                                  | Partition Table                         | Single factory app, no OTA   | Custom partition table CSV |
-| LVGL Configuration                               | LVGL Minimal Configuration              | false                        | true                       |
-| LVGL Configuration                               | Swap 2 byte of RGB565 color             | false                        | true                       |
-| LVGL Configuration - Debug Settings - Font Usage | Enable Monsterrat 14/18/30/40/48        | false                        | true                       |
-| LVGL Configuration - LVGL TFT Display controller | Select predefined display configuration | ESP-Wrover-KIT v4.1          | None                       |
-| LVGL Configuration - LVGL TFT Display controller | Display orientation                     | Portrait                     | Portrait inverted          |
-| LVGL Configuration - LVGL TFT Display controller | Select predefined board pinouts         | ESP32 DevKit v4 with 38 pins | None                       |
-| LVGL Configuration - LVGL TFT Display controller | Select a display controller model       | -                            | ILI9341                    |
-| LVGL Configuration - LVGL                        | TFT SPI Bus                             | HSPI                         | VSPI                       |
-| LVGL Configuration - LVGL                        | TFT Data Transfer Mode                  | -                            | SIO (MISO/MOSI)            |
-| LVGL Configuration - LVGL                        | TFT SPI Duplex Mode                     | -                            | HALF DUPLEX                |
-| LVGL Configuration - Display Pin Assignments     | GPIO for MOSI (Master Out Slave In)     | -                            | 19                         |
-| LVGL Configuration - Display Pin Assignments     | GPIO for CLK (SCK / Serial Clock)       | -                            | 5                          |
-| LVGL Configuration - Display Pin Assignments     | GPIO for CS (Slave Select)              | -                            | 26                         |
-| LVGL Configuration - Display Pin Assignments     | GPIO for DC (Data / Command)            | -                            | 25                         |
-| LVGL Configuration - Display Pin Assignments     | GPIO for Reset                          | -                            | 4                          |
-| LVGL Configuration - LVGL Touch controller       | Select a touch panel controller model   | -                            | None                       |
+| Section                                                     | Name                                | Default                           | Changed to                     |
+| ----------------------------------------------------------- | ----------------------------------- | --------------------------------- | ------------------------------ |
+| Serial flasher config                                       | Flash size                          | `2 MB`                            | `4 MB`                         |
+| Partition Table                                             | Partition Table                     | `Single factory app, no OTA`      | `Custom partition table CSV`   |
+| LVGL Configuration                                          | LVGL Minimal Configuration          | `false`                           | `true`                         |
+| LVGL Configuration                                          | Maximal horizontal resolution       | `480`                             | `320`                          |
+| LVGL Configuration                                          | Maximal vertical resolution         | `320`                             | `240`                          |
+| LVGL Configuration                                          | Swap 2 byte of RGB565 color         | `false`                           | `true`                         |
+| LVGL Configuration - Debug Settings - Enable built-in fonts | Enable Monsterrat 18/30/40/48       | `false`                           | `true`                         |
+| LVGL Configuration - Debug Settings - Theme usage           | Theme select                        | `Material`                        | `Empty`                        |
+| LVGL Configuration - Debug Settings - Theme usage           | Select theme default init           | `Default init for material theme` | `Default init for empty theme` |
+| LVGL Configuration - Debug Settings - Theme usage           | Enable Monsterrat 18/30/40/48       | `false`                           | `true`                         |
+| LVGL Configuration - LVGL TFT Display controller            | Display orientation                 | `Portrait`                        | `Portrait inverted`            |
+| LVGL Configuration - LVGL                                   | TFT SPI Bus                         | `HSPI`                            | `VSPI`                         |
+| LVGL Configuration - Display Pin Assignments                | GPIO for MOSI (Master Out Slave In) | `13`                              | `19`                           |
+| LVGL Configuration - Display Pin Assignments                | GPIO for CLK (SCK / Serial Clock)   | `14`                              | `5`                            |
+| LVGL Configuration - Display Pin Assignments                | GPIO for CS (Slave Select)          | `15`                              | `26`                           |
+| LVGL Configuration - Display Pin Assignments                | GPIO for DC (Data / Command)        | `2`                               | `25`                           |
+| LVGL Configuration - Display Pin Assignments                | GPIO for Reset                      | `4`                               | `4`                            |
+
+#### Important config options that were set by default, but are pertinent:
+
+| Section                                          | Name                                                     | Default                            |
+| ------------------------------------------------ | -------------------------------------------------------- | ---------------------------------- |
+| LVGL Configuration                               | Color depth                                              | `16: RGB565`                       |
+| LVGL Configuration - LVGL TFT Display controller | Select predefined display configuration                  | `None`                             |
+| LVGL Configuration - LVGL TFT Display controller | Select predefined board pinouts                          | `None`                             |
+| LVGL Configuration - LVGL TFT Display controller | Select a display controller model                        | `ILI9341`                          |
+| LVGL Configuration - LVGL TFT Display controller | Use custom display buffer size (bytes)                   | `false`                            |
+| LVGL Configuration - LVGL TFT Display controller | Use custom SPI clock frequency                           | `false`                            |
+| LVGL Configuration - LVGL TFT Display controller | TFT Data Transfer Mode                                   | `SIO (MISO/MOSI)`                  |
+| LVGL Configuration - LVGL TFT Display controller | TFT SPI Duplex Mode                                      | `HALF DUPLEX`                      |
+| LVGL Configuration - Display Pin Assignments     | GPIO for MISO (Master In Slave Out)                      | `false`                            |
+| LVGL Configuration - Display Pin Assignments     | Use CS signal to control the display                     | `true`                             |
+| LVGL Configuration - Display Pin Assignments     | Use DC signal to control the display                     | `true`                             |
+| LVGL Configuration - Display Pin Assignments     | Enable control of the display backlight by using an GPIO | `false` NOTE: (Controlled via PWM) |
+| LVGL Configuration - LVGL Touch controller       | Select a touch panel controller model                    | `None`                             |
 
 ### Build
 
