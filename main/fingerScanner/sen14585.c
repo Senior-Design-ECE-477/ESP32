@@ -1,10 +1,9 @@
 #include "sen14585.h"
-#include "debug.h"
 
 uint8_t data[12];
 
 // Initialization UART commands
-uint8_t init_cmd[]=                 {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01};
+uint8_t init_cmd[] =                {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01};
 uint8_t change_baud_cmd[]=          {0x55, 0xAA, 0x01, 0x00, 0x00, 0xC2, 0x01, 0x00, 0x04, 0x00, 0xC7, 0x01};
 uint8_t light_on_cmd[]=             {0x55, 0xAA, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x12, 0x00, 0x13, 0x01};
 uint8_t light_off_cmd[]=            {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x00, 0x12, 0x01};
@@ -17,14 +16,23 @@ uint8_t enroll3_cmd[] =             {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0
 //Utility UART commands
 uint8_t get_enroll_count_cmd[] =    {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x20, 0x01};
 uint8_t check_enrolled_cmd[] =      {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x21, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
-uint8_t is_press_finger[] =         {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x00, 0x26, 0x01};
+uint8_t is_press_finger_cmd[] =     {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x26, 0x00, 0x26, 0x01};
+uint8_t capture_finger_enroll_cmd[]={0x55, 0xAA, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x60, 0x00, 0x61, 0x01}; // param4 is nonzero for enrollment
+uint8_t capture_finger_verify_cmd[]={0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x60, 0x01}; // its 0 here for faster results
 uint8_t delete_id_cmd[] =           {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
 uint8_t delete_all_cmd[] =          {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x41, 0x00, 0x41, 0x01};
 uint8_t verify_cmd[] =              {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00}; // 4-7 and 10-11 need to be changed
 uint8_t identify_cmd[] =            {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x51, 0x00, 0x51, 0x01};
 uint8_t enter_standby_cmd[] =       {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF9, 0x00, 0xF9, 0x01};
+uint8_t exit_cmd[] =                {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00};
 uint8_t close_cmd[] =               {0x55, 0xAA, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x02, 0x01};
 
+/*
+* This function must be called at the start of the program. It will initialize the fingerprint scanner UART communications,
+* and set buffers for TX and RX
+*
+* @return esp_err_t - will return ESP_OK on success, ESP_FAIL otherwise
+*/
 esp_err_t init_uart() {
     /* Configure parameters of an UART driver,
     * communication pins and install the driver */
@@ -49,44 +57,233 @@ esp_err_t init_uart() {
     vTaskDelay(2000 / portTICK_PERIOD_MS);
 
     send_uart_command(init_cmd, data);
-    send_uart_command(change_baud_cmd, data);
-    uart_set_baudrate(UART_PORT_NUM, 115200);
+    //send_uart_command(change_baud_cmd, data);
+    //uart_set_baudrate(UART_PORT_NUM, 115200);
 
     return ESP_OK;
 }
 
+/*
+* This function will turn the LED on
+*
+* @return esp_err_t - will return ESP_OK on success, ESP_FAIL otherwise
+*/
 esp_err_t led_light_on(){
     if(send_uart_command(light_on_cmd, data) != ESP_OK) return ESP_FAIL;
-    debug_print("Response", data);
     return ESP_OK;
 }
 
+/*
+* This function will turn the LED off
+*
+* @return esp_err_t - will return ESP_OK on success, ESP_FAIL otherwise
+*/
 esp_err_t led_light_off(){
     if(send_uart_command(light_off_cmd, data) != ESP_OK) return ESP_FAIL;
-    debug_print("Response", data);
     return ESP_OK;
 }
 
-esp_err_t enroll_finger() {
-    return ESP_OK;
+/*
+* This function will go through the entire process of enrolling a finger, printing to the terminal when
+* it is ready for finger to be placed or removed, as well as the fingerprint ID# being registered
+*
+* @return int - returns the ID on success, -1 on failure
+*/
+int enroll_finger() {
+    // Get an open fingerprint to enroll... this will be the return value if successful
+    int newEnroll = 0;
+	int usedid = 1;
+	while (usedid == 1)
+	{
+		usedid = check_if_enrolled(newEnroll);
+		if (usedid == 1) newEnroll++;
+        if(newEnroll >= 256 || usedid == -1) {
+            return -1;
+        }
+	}
+
+    // Get the command to send to the scanner
+    get_cmd_from_value(enroll_start_cmd, newEnroll);
+
+    printf("Start enrollment of fingerprint #%d\n", newEnroll);
+    // Send the command to the scanner, and if it fails, return an error
+    if(send_uart_command(enroll_start_cmd, data) != ESP_OK) return -1;
+
+    // Make sure the received correctly
+    if(data[8] != 0x30) {
+        if((data[4] == 0x09 || data[4] == 0x03) && data[5] == 0x10) { // If the Database is full or an invalid position, return fail
+            return -1;
+        }
+    }
+
+    // Wait until finger is pressed
+    printf("Press down a finger\n");
+    
+    while(isPressed(is_press_finger_cmd, data) == false) {
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+
+    bool goodPrint = captureFinger(capture_finger_enroll_cmd, data);
+    
+
+    if(goodPrint != false) {
+        printf("Remove finger\n");
+        if(enroll(enroll1_cmd, data) != ESP_OK) return -1;
+
+        // Wait until finger is removed
+        while(isPressed(is_press_finger_cmd, data) == true) {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+
+        printf("Press the same finger again\n");
+
+        while(isPressed(is_press_finger_cmd, data) == false) {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+
+        goodPrint = captureFinger(capture_finger_enroll_cmd, data);
+
+        if(goodPrint != false) {
+            printf("Remove finger\n");
+            if(enroll(enroll2_cmd, data) != ESP_OK) return -1;
+
+            // Wait until finger is removed
+            while(isPressed(is_press_finger_cmd, data) == true) {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            }
+            printf("Press the same finger one more time\n");
+            while(isPressed(is_press_finger_cmd, data) == false) {
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            }
+
+            goodPrint = captureFinger(capture_finger_enroll_cmd, data);
+
+            if(goodPrint != false) {
+                printf("Remove finger\n");
+				if(enroll(enroll3_cmd, data) != ESP_OK) return -1;
+            } else {
+                printf("Failed to capture third finger\n");
+            }
+        } else {
+            printf("Failed to capture second finger\n");
+        }
+    } else {
+        printf("Failed to capture first finger\n");
+    }
+    return newEnroll;
+}
+
+/*
+* This function will delete a specific fingerprint ID from the scanner
+*
+* @param id - the fingerprint ID to delete
+* @return esp_err_t - will return ESP_OK on success, ESP_FAIL otherwise
+*/
+esp_err_t delete_finger(int id){
+    get_cmd_from_value(delete_id_cmd, id);
+    if(send_uart_command(delete_id_cmd, data) != ESP_OK) return ESP_FAIL;
+    
+    if(data[8] == 0x30) return ESP_OK; // if it returns a ACK packet
+    
+    return ESP_FAIL;
+}
+
+/*
+* This function will delete all stored fingerprints from the scanner
+*
+* @return esp_err_t - will return ESP_OK on success, ESP_FAIL otherwise
+*/
+esp_err_t delete_all_finger(){
+    
+    if(send_uart_command(delete_all_cmd, data) != ESP_OK) return ESP_FAIL;
+    
+    if(data[8] == 0x30) return ESP_OK; // if it returns a ACK packet
+    
+    return ESP_FAIL;
 }
 
 
-esp_err_t send_fingerprint_command(){
-    return ESP_OK;
+/*
+* This function is identify a finger that has been set on the device. If a registered fingerprint ID matches,
+* this will return the ID number, otherwise it will return -1 if not found in 10 seconds
+*
+* @return int - the fingerprint ID number, or -1 if not found in 10 seconds
+*/
+int identify_finger() {
+    float timer = 0;
+    while(isPressed(is_press_finger_cmd, data) == false && timer < 10) { //Change max wait time to identify
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+        timer += 0.1;
+    }
+
+    captureFinger(capture_finger_verify_cmd, data);
+    
+    if(send_uart_command(identify_cmd, data) != ESP_OK) return -1;
+
+	return get_value_from_cmd(data);
 }
 
+
+/*
+* This function is called to enter the fingerprint scanner to standby mode (low power mode).
+* First turns the LED off, then puts the device in low power mode
+*/
+void enter_standby_mode(){
+    led_light_off();
+    send_uart_command(enter_standby_cmd, data);
+}
+
+/*
+* This function is called to exit the fingerprint scanner from standby mode (low power mode).
+* First sends a 0x00 bit, before delaying the required time and turning the LED back on.
+*/
+void exit_standby_mode(){
+    send_uart_command(exit_cmd, data);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+    led_light_on();
+}
+
+/*
+* This function is called to see how many fingerprints are currently enrolled on the scanner
+*
+* It will return the number of fingerprints as an integer after going through data processing from little to big endian format
+* @return number of fingerprints
+* @return -1 if failure
+*/
 int get_enroll_count(){
-    if(send_uart_command(get_enroll_count_cmd, data) != ESP_OK) return ESP_FAIL;
+    if(send_uart_command(get_enroll_count_cmd, data) != ESP_OK) return -1;
 
-    //From 4-7 is the number of fingerprints saved in system
-    int numFingers = get_parameter_value(data);                                         //////////////////////////////////////////////////////////////////////////
-
-    debug_print("Response", data);
+    int numFingers = get_value_from_cmd(data);
+    
     return numFingers;
 }
 
+/*
+* This function is called to see if a fingerprint ID is currently enrolled on the scanner
+*
+* @return 1 if fingerprint ID is currently enrolled
+* @return 0 if fingerprint ID is not currently enrolled
+* @return -1 if error
+*/
+int check_if_enrolled(int id) {
+    get_cmd_from_value(check_enrolled_cmd, id);
+    if(send_uart_command(check_enrolled_cmd, data) != ESP_OK) return -1;
+    if(data[8] == 0x30) return 1;
+    if(data[8] == 0x31){
+        if(data[4] == 0x04 && data[5] == 0x10){ // 0x1004 (little endian) is NACK_IS_NOT_USED
+            return 0;
+        } else if (data[4] == 0x03 && data[5] == 0x10){ // 0x1003 (little endian) is NACK_INVALID_POS
+            return -1;
+        }
+    }
+    return -1;
+}
 
+/*----------------------------------------------------------------
+* This function is to close a UART communication with the fingerprint scanner
+* 
+* @return ESP_OK if successful, ESP_FAIL otherwise
+*/
 esp_err_t close_uart(){
     if(send_uart_command(close_cmd, data) != ESP_OK) return ESP_FAIL;
     return ESP_OK;
