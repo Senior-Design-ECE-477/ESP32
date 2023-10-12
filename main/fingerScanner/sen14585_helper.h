@@ -6,7 +6,7 @@
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"
 #include "esp_err.h"
-
+#include "esp_log.h"
 
 
 #define UART_PORT_NUM 1

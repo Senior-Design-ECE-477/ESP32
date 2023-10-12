@@ -63,7 +63,8 @@ char *aws_verify_user(int value)
     esp_http_client_handle_t client = esp_http_client_init(&config_post);
 
     // EntryValue can be fingerprint ID or passcode
-    int num_chars_value = (int)((ceil(log10(value)) + 1) * sizeof(char));
+    
+    int num_chars_value = snprintf(NULL, 0, "%d", value) + 1;
     int num_chars = num_chars_value + (42 * sizeof(char));
     char post_data[num_chars];
     snprintf(post_data, num_chars, "{\"EntryValue\": %d, \"LockName\": \"main-door\"}", value);

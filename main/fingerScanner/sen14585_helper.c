@@ -15,6 +15,7 @@ esp_err_t send_uart_command(uint8_t* cmd, uint8_t* data){
     int retLen = -1;
     int attempt = 0;
     
+    // ESP_LOGI("IN SEND UART COMMAND", "Entered");
     // Send the command throught UART to the fingerprint scanner
     len = uart_write_bytes(UART_PORT_NUM, cmd, 12);
 
@@ -40,8 +41,8 @@ esp_err_t send_uart_command(uint8_t* cmd, uint8_t* data){
         return ESP_FAIL;
     }
 
-    // Reads the data from the incoming UART buffer and puts into the data buffer, max of 1 second wait
-    uart_read_bytes(UART_PORT_NUM, data, retLen, 1000);
+    // Reads the data from the incoming UART buffer and puts into the data buffer, max of 100 millisecond wait
+    uart_read_bytes(UART_PORT_NUM, data, retLen, 100);
     
     return ESP_OK;
 }
@@ -55,13 +56,13 @@ esp_err_t send_uart_command(uint8_t* cmd, uint8_t* data){
 */
 int get_value_from_cmd(uint8_t* data){
     int value;
-
+    // ESP_LOGI("GET VAL FROM CMD", "Entered");
     //Parameter is in indices 4-7
     value = data[4];
     value += (data[5] << 8);
     value += (data[6] << 16);
     value += (data[7] << 24);
-
+    // ESP_LOGI("GET VAL FROM CMD", "Added, now returning");
     return value;
 }
 

@@ -47,7 +47,7 @@ void cafs_init()
     initialize_sntp();       // Setup time server
     pwm_ControllerInit();    // Setup pwm
     pwm_ControllerSet(0.95); // Start with dimmed pwm
-
+    init_uart();
     // Setul's test setup
     // esp_rom_gpio_pad_select_gpio(13);
     // gpio_set_direction(13, GPIO_MODE_OUTPUT);
@@ -55,7 +55,8 @@ void cafs_init()
     // esp_rom_gpio_pad_select_gpio(14);
     // gpio_set_direction(14, GPIO_MODE_INPUT);
     // esp_rom_gpio_pad_select_gpio(32);
-    // gpio_set_direction(32, GPIO_MODE_INPUT);
+    gpio_set_direction(38, GPIO_MODE_INPUT);
+    gpio_set_direction(34, GPIO_MODE_INPUT);
 }
 
 void cafs_entryEventISR() {}
@@ -93,8 +94,12 @@ void cafs_checkAccess(int value)
     regex_t regex;
     int return_value;
 
-    char *api_result = aws_verify_user(value);
+    if(value == -1) {
+        ESP_LOGE(TAG, "Invalid ID");
+        return;
+    }
 
+    char *api_result = aws_verify_user(value);
     return_value = regcomp(&regex, "UNLOCKED", 0);
     return_value = regexec(&regex, api_result, 0, NULL, 0);
     regfree(&regex);
@@ -113,7 +118,8 @@ void cafs_runMainTask(void *pvParameter)
 {
     ESP_LOGI(TAG, "Main task started");
     uint8_t count = 0; // Max number of 256
-    uint8_t id = 3;
+    int id = 3;
+
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(20)); // Delay between checks
@@ -129,10 +135,20 @@ void cafs_runMainTask(void *pvParameter)
             count++;
         }
         // Setul's test setup
-        // if (gpio_get_level(14) == 1)
-        // {
-        //     cafs_checkAccess(id);
-        // }
+        if (gpio_get_level(34) == 1)
+        {
+            led_light_on();
+            id = identify_finger();
+            printf("ID:  %d\n", id);
+            led_light_off();
+            cafs_checkAccess(id);
+        }
+        if(gpio_get_level(38) == 0){
+            led_light_on();
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+            printf("Fingerprint ID: %d\n", enroll_finger());
+            led_light_off();
+        }
         // if (gpio_get_level(32) == 1)
         // {
         //     ui_ShowKeypad_Animation(0);

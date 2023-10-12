@@ -29,6 +29,7 @@
 #include "aws/aws_http.h"
 #include "utils/wifi.h"
 #include "ui/ui.h"
+#include "fingerScanner/sen14585.h"
 
 /* lvgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE

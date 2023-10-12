@@ -122,7 +122,7 @@ int enroll_finger() {
     while(isPressed(is_press_finger_cmd, data) == false) {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-
+    ESP_LOGI("Enroll Finerprint", "FINGER PRESSED");
     bool goodPrint = captureFinger(capture_finger_enroll_cmd, data);
     
 
@@ -211,16 +211,26 @@ esp_err_t delete_all_finger(){
 */
 int identify_finger() {
     float timer = 0;
+    int id = -1;
     while(isPressed(is_press_finger_cmd, data) == false && timer < 10) { //Change max wait time to identify
         vTaskDelay(100 / portTICK_PERIOD_MS);
         timer += 0.1;
     }
+    ESP_LOGI("ID Finger", "Finger is pressed");
 
     captureFinger(capture_finger_verify_cmd, data);
     
-    if(send_uart_command(identify_cmd, data) != ESP_OK) return -1;
+    ESP_LOGI("ID Finger", "Finger captured");
 
-	return get_value_from_cmd(data);
+
+    if(send_uart_command(identify_cmd, data) != ESP_OK) return -1;
+    ESP_LOGI("ID Finger", "ID command sent");
+    id = get_value_from_cmd(data);
+    if(id > 255){
+        printf("ID IS -1\n");
+        return -1;
+    }
+	return id;
 }
 
 
