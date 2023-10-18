@@ -59,7 +59,7 @@ void cafs_init();
  * @brief Update current wifi state. Set wifi indicator and check signal, if the
  * signal is low, attempt to reconnect.
  */
-void cafs_updateWifiState();
+void cafs_update_wifi();
 
 /**
  * @brief This function will connect to AWS and check if the current user is allowed
@@ -67,28 +67,28 @@ void cafs_updateWifiState();
  * and checking the user’s permissions.
  * @param value Can be ID of fingerprint or the passcode as an integer
  */
-void cafs_checkAccess(int value);
+void cafs_check_access(int value);
 
 /**
  * @brief Set the system to sleep mode
  */
-void cafs_systemSleep();
+void cafs_sleep();
 
 /**
  * @brief Wake the system if in sleep mode
  */
-void cafs_systemWake();
+void cafs_wake();
 
 /**
  * @brief Main thread function to be used as the loop in a thread for wifi, keypad, ui, and time updates.
  * @param pvParamter: task parameter
  */
-void cafs_runMainTask(void *pvParameter);
+void cafs_main_task(void *pvParameter);
 
 /**
  * @brief Start LVGL, init drivers, and init UI. Then start the loop for the screen.
  * @param pvParamter: task parameter
  */
-void cafs_runScreenGUI(void *pvParameter);
+void cafs_gui_task(void *pvParameter);
 
 #endif /* _REALTIME_H */

@@ -1,5 +1,5 @@
 /**
- * @file system.c
+ * @file cafs.c
  * All system or multi-component project-specific functions C implementation file
  */
 
@@ -18,15 +18,16 @@ SemaphoreHandle_t xInterruptSemaphore;
 /////////////////////////////////////
 //-- Private function prototypes --//
 /////////////////////////////////////
+/* See cafs.h for Public function prototypes and descriptions */
 
 /**
  * @brief Interrupt Service Routine handler function for the even an entry is requested.
  * This function is declared as IRAM_ATTR. This is an event triggered by an interrupt when
  * the user wakes the system by either entering a passcode or using a fingerprint. It will
- * run the cafs_checkAccess function when an entry request is submitted.
+ * run the cafs_check_access function when an entry request is submitted.
  * @param arg
  */
-static void IRAM_ATTR _entryEventISR_handler(void *arg);
+static void IRAM_ATTR _cafs_isr_handler(void *arg);
 
 /**
  * @brief This function is run when access is granted to the user.
@@ -34,13 +35,13 @@ static void IRAM_ATTR _entryEventISR_handler(void *arg);
  * the screen shows the welcome animation.
  * @param username The name of the user that was granted access
  */
-static void _accessGranted(char *username);
+static void _access_granted(char *username);
 
 /**
  * @brief This function is run when access is not granted to the user.
  * User data on AWS will be updated and the screen shows the shake animation.
  */
-static void _accessDenied();
+static void _access_denied();
 
 /**
  * @brief This function is a ticker function for lvgl
@@ -53,93 +54,94 @@ static void _ticker(void *arg);
 
 void cafs_init()
 {
-    nvs_flash_init();        // Setup non-volatile flash
-    initialize_wifi();       // Setup wifi
-    initialize_sntp();       // Setup time server
-    pwm_ControllerInit();    // Setup pwm
-    pwm_ControllerSet(0.95); // Start with dimmed pwm
+    nvs_flash_init(); // Setup non-volatile flash
+    wifi_init();      // Setup wifi
+    time_init();      // Setup time server
+    pwm_init();       // Setup pwm
 
     // Setul's test setup
     // pin 32 is set to button input for ISR
     // pin 14 is for button input for aws call
+    esp_rom_gpio_pad_select_gpio(14);
+    gpio_set_direction(14, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(32);
+    gpio_set_direction(32, GPIO_MODE_INPUT);
 
-    // esp_rom_gpio_pad_select_gpio(14);
-    // gpio_set_direction(14, GPIO_MODE_INPUT);
-    // esp_rom_gpio_pad_select_gpio(32);
-    // gpio_set_direction(32, GPIO_MODE_INPUT);
-
-    // gpio_set_intr_type(32, GPIO_INTR_POSEDGE);
-    // gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
-    // gpio_isr_handler_add(32, _entryEventISR_handler, NULL);
+    gpio_set_intr_type(32, GPIO_INTR_POSEDGE);
+    gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
+    gpio_isr_handler_add(32, _cafs_isr_handler, NULL);
 }
 
 // Sleep modes:
 // https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html
-void cafs_systemSleep() { pwm_ControllerSet(0.05); }
-void cafs_systemWake() { pwm_ControllerSet(1); }
+void cafs_sleep() { pwm_set(0.05); }
+void cafs_wake() { pwm_set(1); }
 
-void cafs_updateWifiState()
+void cafs_update_wifi()
 {
     wifi_ap_record_t wifi_info = wifi_connect();
     // Low signal, one bar
     if ((wifi_info.rssi < -75) & (wifi_info.rssi > -91))
     {
-        ui_SetWifiBarNumber(OneBar);
+        ui_set_wifi_bars(OneBar);
     }
     // Two bars
     else if (wifi_info.rssi < -50)
     {
-        ui_SetWifiBarNumber(TwoBars);
+        ui_set_wifi_bars(TwoBars);
     }
     // Three bars
     else if (wifi_info.rssi <= 0)
     {
-        ui_SetWifiBarNumber(ThreeBars);
+        ui_set_wifi_bars(ThreeBars);
     }
     else
     {
-        ui_SetWifiBarNumber(NoBars);
+        ui_set_wifi_bars(NoBars);
     }
 }
 
-void cafs_checkAccess(int value)
+void cafs_check_access(int value)
 {
     regex_t regex;
     int return_value;
 
     char *api_result = aws_verify_user(value);
-    ESP_LOGI(TAG, "API RESULT: %s", api_result);
 
     return_value = regcomp(&regex, "UNLOCKED", 0);
     return_value = regexec(&regex, api_result, 0, NULL, 0);
-    regfree(&regex);
 
     if (return_value == 0)
     {
-        _accessGranted("Setul");
+        _access_granted("Setul");
     }
     else
     {
-        _accessDenied();
+        _access_denied();
     }
+
+    regfree(&regex);
 }
 
-void cafs_runMainTask(void *pvParameter)
+void cafs_main_task(void *pvParameter)
 {
     (void)pvParameter;
     xInterruptSemaphore = xSemaphoreCreateBinary();
 
     ESP_LOGI(TAG, "Main task started");
 
-    uint16_t count = 0;
+    cafs_init();   // Start system tools
+    pwm_set(0.95); // Start with dimmed pwm
+
+    u_short count = 0;
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(CAFS_DELAY_TICKS * portTICK_PERIOD_MS)); // Delay of 1 tick = 10ms = 1000ms / 10ms = 100 calls/s
         if (count >= 500)                                                 // Every 10ms * 500 = 5000ms
         {
-            cafs_updateWifiState();            // Update wifi info
-            struct tm time_now = getTime();    // Get datetime
-            ui_UpdateDateTime(time_now, true); // Update datetime on UI
+            cafs_update_wifi();               // Update wifi info
+            struct tm t_now = time_get_now(); // Get current time
+            ui_update_datetime(t_now, true);  // Update datetime on UI
             count = 0;
         }
         else
@@ -147,24 +149,27 @@ void cafs_runMainTask(void *pvParameter)
             count++;
         }
 
+        // Poll ISR Semaphore
         if (pdTRUE == xSemaphoreTake(xInterruptSemaphore, 0))
         {
             // do interuppt stuff
             ESP_LOGW(TAG, "ISR: Method not implemented");
         }
 
-        // Setul's test setup
+        // Poll Keypad
+        // kp_poll();
 
-        // if (gpio_get_level(14) == 1)
-        // {
-        //     cafs_checkAccess(0);
-        // }
+        // Setul's test setup
+        if (gpio_get_level(14) == 1)
+        {
+            cafs_check_access(0);
+        }
     }
 
     vTaskDelete(NULL);
 }
 
-void cafs_runScreenGUI(void *pvParameter)
+void cafs_gui_task(void *pvParameter)
 {
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
@@ -236,35 +241,34 @@ void cafs_runScreenGUI(void *pvParameter)
 //-- Private functions --//
 ///////////////////////////
 
-void _entryEventISR_handler(void *arg)
+void IRAM_ATTR _cafs_isr_handler(void *arg)
 {
     xSemaphoreGiveFromISR(xInterruptSemaphore, NULL);
 }
 
-void _accessGranted(char *username)
+void _access_granted(char *username)
 {
-    ui_Unlock();
-    ui_setName(username);
-    ui_Welcome_Animation(500);
+    ESP_LOGI(TAG, "Access Granted");
+    ui_unlock();
+    ui_set_name(username);
+    ui_anim_home_to_welcome(500);
 
     // if motor not unlocked...
-    ESP_LOGI("MOTOR", "UNLOCK");
+
     motor_unlock();
     vTaskDelay(pdMS_TO_TICKS(3000));
     motor_off();
-    ESP_LOGI("MOTOR", "OFF");
 }
 
-void _accessDenied()
+void _access_denied()
 {
-    ui_Lock();
-    ui_ShakeLock_Animation(0);
+    ESP_LOGE(TAG, "Access Denied");
+    ui_lock();
+    ui_anim_shake_lock(0);
 
     // if motor not locked...
-    ESP_LOGI("MOTOR", "LOCKING");
     motor_lock();
     vTaskDelay(pdMS_TO_TICKS(3000));
-    ESP_LOGI("MOTOR", "OFF");
     motor_off();
 }
 

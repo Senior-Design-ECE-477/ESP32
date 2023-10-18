@@ -36,7 +36,7 @@
  * @brief This function initializes the LEDC channel to a specified pin number
  * and configuration. Then the LEDC timer is configured and initialized.
  */
-void pwm_ControllerInit(void);
+void pwm_init(void);
 
 /**
  * @brief This function takes in a value from 0 to 1, a percentage in decimal form.
@@ -44,6 +44,6 @@ void pwm_ControllerInit(void);
  * multiplying by the max duty that is calculated. The duty is then set to the
  * calculated value.
  */
-void pwm_ControllerSet(float left_duty_fraction);
+void pwm_set(float left_duty_fraction);
 
 #endif /* _PWM_CONTROLLER_H */

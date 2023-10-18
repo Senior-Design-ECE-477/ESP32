@@ -6,22 +6,22 @@
 static const char *TAG = "ui";
 
 ///////////////////// VARIABLES ////////////////////
-void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
-void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay);
-void ui_Welcome_Animation(int delay);
-void ui_ShowKeypad_Animation(int delay);
-void ui_ShakeKeypad_Animation(int delay);
-void ui_Unlock();
-void ui_Lock();
-void ui_ShakeLock_Animation(int delay);
-void ui_KeypadToHome_Animation(int delay);
-void ui_KeypadToWelcome_Animation(int delay);
+void ui_anim_fade_green(lv_obj_t *TargetObject, int delay);
+void ui_anim_time_and_lock_to_top(int delay, int reverse_delay);
+void ui_anim_home_to_welcome(int delay);
+void ui_anim_show_keypad(int delay);
+void ui_anim_shake_keypad(int delay);
+void ui_unlock();
+void ui_lock();
+void ui_anim_shake_lock(int delay);
+void ui_anim_keypad_to_home(int delay);
+void ui_anim_keypad_to_welcome(int delay);
 // SCREEN: ui_MainScreen
-void ui_MainScreen_screen_init(void);
-WifiBar ui_GetWifiBarNumber();
-void ui_SetWifiBarNumber(WifiBar bars);
-void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour);
-void ui_setName(char *name);
+void ui_screen_init_main(void);
+WifiBar ui_get_wifi_bars();
+void ui_set_wifi_bars(WifiBar bars);
+void ui_update_datetime(const struct tm time_info, bool twelve_hour);
+void ui_set_name(char *name);
 lv_style_t colorPanelStyle;
 lv_style_t keypadPanelStyle;
 lv_style_t text48Style;
@@ -61,7 +61,7 @@ lv_obj_t *ui____initial_actions0;
 
 void ui_init(void)
 {
-    ui_MainScreen_screen_init();
+    ui_screen_init_main();
     // ui____initial_actions0 = lv_obj_create(NULL, NULL);
     lv_scr_load(ui_MainScreen);
 }

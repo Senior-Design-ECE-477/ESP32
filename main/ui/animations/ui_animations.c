@@ -52,7 +52,7 @@ lv_anim_start(&a); // Start the animation
 
 */
 
-void ui_FadeGreen_Animation(lv_obj_t *obj, int delay)
+void ui_anim_fade_green(lv_obj_t *obj, int delay)
 {
     // Init
     lv_anim_t a;
@@ -75,7 +75,7 @@ void ui_FadeGreen_Animation(lv_obj_t *obj, int delay)
     lv_anim_start(&a);
 }
 
-void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay)
+void ui_anim_time_and_lock_to_top(int delay, int reverse_delay)
 {
     // Init
     lv_anim_t a;
@@ -148,7 +148,7 @@ void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay)
     lv_anim_start(&a);
 }
 
-void ui_ShakeLock_Animation(int delay)
+void ui_anim_shake_lock(int delay)
 {
     // Init
     lv_anim_t a;
@@ -166,9 +166,9 @@ void ui_ShakeLock_Animation(int delay)
     lv_anim_start(&a);
 }
 
-void ui_Welcome_Animation(int delay)
+void ui_anim_home_to_welcome(int delay)
 {
-    ui_TimeAndIconsToTop_Animation(delay, 2500 + 750);
+    ui_anim_time_and_lock_to_top(delay, 2500 + 750);
 
     // Init
     lv_anim_t a;
@@ -203,9 +203,9 @@ void ui_Welcome_Animation(int delay)
     // lv_anim_start(&a);
 }
 
-void ui_ShowKeypad_Animation(int delay)
+void ui_anim_show_keypad(int delay)
 {
-    ui_TimeAndIconsToTop_Animation(delay, -1);
+    ui_anim_time_and_lock_to_top(delay, -1);
 
     // Init
     lv_anim_t a;
@@ -234,7 +234,7 @@ void ui_ShowKeypad_Animation(int delay)
     lv_anim_start(&a);
 }
 
-void ui_KeypadToHome_Animation(int delay)
+void ui_anim_keypad_to_home(int delay)
 {
     // Init
     lv_anim_t a;
@@ -311,7 +311,7 @@ void ui_KeypadToHome_Animation(int delay)
     lv_anim_start(&a);
 }
 
-void ui_KeypadToWelcome_Animation(int delay)
+void ui_anim_keypad_to_welcome(int delay)
 {
     // Init
     lv_anim_t a;
@@ -405,7 +405,7 @@ void ui_KeypadToWelcome_Animation(int delay)
     lv_anim_start(&a);
 }
 
-void ui_ShakeKeypad_Animation(int delay)
+void ui_anim_shake_keypad(int delay)
 {
     // Init
     lv_anim_t a;
@@ -423,7 +423,7 @@ void ui_ShakeKeypad_Animation(int delay)
     lv_anim_start(&a);
 }
 
-void ui_Unlock()
+void ui_unlock()
 {
     // Hide locked
     lv_obj_set_hidden(ui_LockIcon, true);
@@ -431,7 +431,7 @@ void ui_Unlock()
     lv_obj_set_hidden(ui_UnlockIcon, false);
 }
 
-void ui_Lock()
+void ui_lock()
 {
     // Show locked
     lv_obj_set_hidden(ui_LockIcon, false);

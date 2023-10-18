@@ -6,7 +6,7 @@
 #include "../ui.h"
 static const char *TAG = "ui";
 
-void ui_MainScreen_screen_init(void)
+void ui_screen_init_main(void)
 {
     ui_MainScreen = lv_obj_create(NULL, NULL);
     static lv_style_t backgroundStyle;
@@ -195,7 +195,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_auto_realign(ui_PasscodeLabel, true);
 }
 
-WifiBar ui_GetWifiBarNumber()
+WifiBar ui_get_wifi_bars()
 {
     if (!lv_obj_get_hidden(ui_WifiIcon1Bar))
     {
@@ -215,9 +215,9 @@ WifiBar ui_GetWifiBarNumber()
     }
 }
 
-void ui_SetWifiBarNumber(WifiBar bar)
+void ui_set_wifi_bars(WifiBar bar)
 {
-    if (ui_GetWifiBarNumber() == bar)
+    if (ui_get_wifi_bars() == bar)
     {
         return;
     }
@@ -225,7 +225,7 @@ void ui_SetWifiBarNumber(WifiBar bar)
     switch (bar)
     {
     case OneBar:
-        ESP_LOGW(TAG, "OneBar");
+        ESP_LOGI(TAG, "OneBar");
         lv_obj_set_hidden(ui_WifiIcon1Bar, false);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
@@ -236,26 +236,26 @@ void ui_SetWifiBarNumber(WifiBar bar)
         lv_obj_set_hidden(ui_WifiIcon2Bar, false);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
-        ESP_LOGW(TAG, "TwoBars");
+        ESP_LOGI(TAG, "TwoBars");
         break;
     case ThreeBars:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, false);
         lv_obj_set_hidden(ui_WifiIconNoBar, true);
-        ESP_LOGW(TAG, "ThreeBars");
+        ESP_LOGI(TAG, "ThreeBars");
         break;
     default:
         lv_obj_set_hidden(ui_WifiIcon1Bar, true);
         lv_obj_set_hidden(ui_WifiIcon2Bar, true);
         lv_obj_set_hidden(ui_WifiIcon3Bar, true);
         lv_obj_set_hidden(ui_WifiIconNoBar, false);
-        ESP_LOGW(TAG, "NoBars");
+        ESP_LOGI(TAG, "NoBars");
         break;
     }
 }
 
-void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
+void ui_update_datetime(const struct tm time_info, bool twelve_hour)
 {
     char time[6] = "12:59\0"; // 00:00
     char ampm[3] = "AM\0";
@@ -310,17 +310,17 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
             lv_label_set_text(ui_AMPMLabel, ampm);
         }
 
-        ESP_LOGW(TAG, "Time set to %s", time);
+        ESP_LOGI(TAG, "Time set to %s", time);
     }
 
     // free(time);
 }
 
-void ui_setName(char *name)
+void ui_set_name(char *name)
 {
     if (strcmp(lv_label_get_text(ui_FirstNameLabel), name) != 0)
     {
         lv_label_set_text(ui_FirstNameLabel, name);
-        ESP_LOGW(TAG, "Name changed to %s", name);
+        ESP_LOGI(TAG, "Name changed to %s", name);
     }
 }

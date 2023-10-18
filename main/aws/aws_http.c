@@ -33,10 +33,10 @@ esp_err_t _client_event_post_handler(esp_http_client_event_handle_t evt)
     case HTTP_EVENT_ON_DATA:
         // This callback is invoked as data is received
         // Copy results into buffer that will be returned
-        ESP_LOGW(TAG, "HTTP_EVENT_ON_DATA: %.*s", evt->data_len, (char *)evt->data);
         if (!esp_http_client_is_chunked_response(evt->client))
         {
             strncpy(receive_buffer, (char *)evt->data, evt->data_len);
+            ESP_LOGW(TAG, "HTTP_EVENT_ON_DATA: %.*s", evt->data_len, (char *)evt->data);
         }
         break;
 

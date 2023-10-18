@@ -4,7 +4,7 @@
 This function is to get the current time using the NTP server, getting
 the current time, and converting it to the local time before printing it out
 */
-struct tm getTime()
+struct tm time_get_now()
 {
     time_t now;
     struct tm ti;
@@ -23,7 +23,7 @@ setting the server, timezone, operating mode, and the sync mode.
 
 Information gathered from https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/system_time.html
 */
-void initialize_sntp(void)
+void time_init(void)
 {
     sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
