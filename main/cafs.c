@@ -1,5 +1,5 @@
 /**
- * @file system.c
+ * @file cafs.c
  * All system or multi-component project-specific functions C implementation file
  */
 
@@ -13,10 +13,21 @@
 ///////////////////
 static const char *TAG = "cafs";
 SemaphoreHandle_t xGuiSemaphore;
+SemaphoreHandle_t xInterruptSemaphore;
 
 /////////////////////////////////////
 //-- Private function prototypes --//
 /////////////////////////////////////
+/* See cafs.h for Public function prototypes and descriptions */
+
+/**
+ * @brief Interrupt Service Routine handler function for the even an entry is requested.
+ * This function is declared as IRAM_ATTR. This is an event triggered by an interrupt when
+ * the user wakes the system by either entering a passcode or using a fingerprint. It will
+ * run the cafs_check_access function when an entry request is submitted.
+ * @param arg
+ */
+static void IRAM_ATTR _cafs_isr_handler(void *arg);
 
 /**
  * @brief This function is run when access is granted to the user.
@@ -24,12 +35,13 @@ SemaphoreHandle_t xGuiSemaphore;
  * the screen shows the welcome animation.
  * @param username The name of the user that was granted access
  */
-static void _accessGranted(char *username);
+static void _access_granted(char *username);
+
 /**
  * @brief This function is run when access is not granted to the user.
  * User data on AWS will be updated and the screen shows the shake animation.
  */
-static void _accessDenied();
+static void _access_denied();
 
 /**
  * @brief This function is a ticker function for lvgl
@@ -42,53 +54,54 @@ static void _ticker(void *arg);
 
 void cafs_init()
 {
-    nvs_flash_init();        // Setup non-volatile flash
-    initialize_wifi();       // Setup wifi
-    initialize_sntp();       // Setup time server
-    pwm_ControllerInit();    // Setup pwm
-    pwm_ControllerSet(0.95); // Start with dimmed pwm
+    nvs_flash_init(); // Setup non-volatile flash
+    wifi_init();      // Setup wifi
+    time_init();      // Setup time server
+    pwm_init();       // Setup pwm
 
     // Setul's test setup
-    // esp_rom_gpio_pad_select_gpio(13);
-    // gpio_set_direction(13, GPIO_MODE_OUTPUT);
-    // gpio_set_level(13, 1);
-    // esp_rom_gpio_pad_select_gpio(14);
-    // gpio_set_direction(14, GPIO_MODE_INPUT);
-    // esp_rom_gpio_pad_select_gpio(32);
-    // gpio_set_direction(32, GPIO_MODE_INPUT);
+    // pin 32 is set to button input for ISR
+    // pin 14 is for button input for aws call
+    esp_rom_gpio_pad_select_gpio(14);
+    gpio_set_direction(14, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(32);
+    gpio_set_direction(32, GPIO_MODE_INPUT);
+
+    gpio_set_intr_type(32, GPIO_INTR_POSEDGE);
+    gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
+    gpio_isr_handler_add(32, _cafs_isr_handler, NULL);
 }
 
-void cafs_entryEventISR() {}
 // Sleep modes:
 // https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html
-void cafs_systemSleep() { pwm_ControllerSet(0.05); }
-void cafs_systemWake() { pwm_ControllerSet(1); }
+void cafs_sleep() { pwm_set(0.05); }
+void cafs_wake() { pwm_set(1); }
 
-void cafs_updateWifiState()
+void cafs_update_wifi()
 {
     wifi_ap_record_t wifi_info = wifi_connect();
     // Low signal, one bar
     if ((wifi_info.rssi < -75) & (wifi_info.rssi > -91))
     {
-        ui_SetWifiBarNumber(OneBar);
+        ui_set_wifi_bars(OneBar);
     }
     // Two bars
     else if (wifi_info.rssi < -50)
     {
-        ui_SetWifiBarNumber(TwoBars);
+        ui_set_wifi_bars(TwoBars);
     }
     // Three bars
     else if (wifi_info.rssi <= 0)
     {
-        ui_SetWifiBarNumber(ThreeBars);
+        ui_set_wifi_bars(ThreeBars);
     }
     else
     {
-        ui_SetWifiBarNumber(NoBars);
+        ui_set_wifi_bars(NoBars);
     }
 }
 
-void cafs_checkAccess(int value)
+void cafs_check_access(int value)
 {
     regex_t regex;
     int return_value;
@@ -97,54 +110,66 @@ void cafs_checkAccess(int value)
 
     return_value = regcomp(&regex, "UNLOCKED", 0);
     return_value = regexec(&regex, api_result, 0, NULL, 0);
-    regfree(&regex);
 
     if (return_value == 0)
     {
-        _accessGranted("Setul");
+        _access_granted("Setul");
     }
     else
     {
-        _accessDenied();
+        _access_denied();
     }
+
+    regfree(&regex);
 }
 
-void cafs_runMainTask(void *pvParameter)
+void cafs_main_task(void *pvParameter)
 {
+    (void)pvParameter;
+    xInterruptSemaphore = xSemaphoreCreateBinary();
+
     ESP_LOGI(TAG, "Main task started");
-    uint8_t count = 0; // Max number of 256
-    uint8_t id = 3;
+
+    cafs_init();   // Start system tools
+    pwm_set(0.95); // Start with dimmed pwm
+
+    u_short count = 0;
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(20)); // Delay between checks
-        if (count >= 250)              // Every 20ms * 250 = 5000ms
+        vTaskDelay(pdMS_TO_TICKS(CAFS_DELAY_TICKS * portTICK_PERIOD_MS)); // Delay of 1 tick = 10ms = 1000ms / 10ms = 100 calls/s
+        if (count >= 500)                                                 // Every 10ms * 500 = 5000ms
         {
-            cafs_updateWifiState();            // Update wifi info
-            struct tm time_now = getTime();    // Get datetime
-            ui_UpdateDateTime(time_now, true); // Update datetime on UI
+            cafs_update_wifi();               // Update wifi info
+            struct tm t_now = time_get_now(); // Get current time
+            ui_update_datetime(t_now, true);  // Update datetime on UI
             count = 0;
         }
         else
         {
             count++;
         }
+
+        // Poll ISR Semaphore
+        if (pdTRUE == xSemaphoreTake(xInterruptSemaphore, 0))
+        {
+            // do interuppt stuff
+            ESP_LOGW(TAG, "ISR: Method not implemented");
+        }
+
+        // Poll Keypad
+        // kp_poll();
+
         // Setul's test setup
-        // if (gpio_get_level(14) == 1)
-        // {
-        //     cafs_checkAccess(id);
-        // }
-        // if (gpio_get_level(32) == 1)
-        // {
-        //     ui_ShowKeypad_Animation(0);
-        //     vTaskDelay(pdMS_TO_TICKS(2000));
-        //     ui_KeypadToWelcome_Animation(10);
-        // }
+        if (gpio_get_level(14) == 1)
+        {
+            cafs_check_access(0);
+        }
     }
 
     vTaskDelete(NULL);
 }
 
-void cafs_runScreenGUI(void *pvParameter)
+void cafs_gui_task(void *pvParameter)
 {
     (void)pvParameter;
     xGuiSemaphore = xSemaphoreCreateMutex();
@@ -152,33 +177,18 @@ void cafs_runScreenGUI(void *pvParameter)
     ESP_LOGI(TAG, "LCD task started");
 
     lv_init();
-
     /* Initialize SPI or I2C bus used by the drivers */
     lvgl_driver_init();
 
     lv_color_t *buf1 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf1 != NULL);
-
-    /* Use double buffered when not working with monochrome displays */
-    // #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     lv_color_t *buf2 = heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     assert(buf2 != NULL);
-    // #else
-    //     static lv_color_t *buf2 = NULL;
-    // #endif
 
     static lv_disp_buf_t disp_buf;
-
     uint32_t size_in_px = DISP_BUF_SIZE;
 
-    // #if defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_IL3820 || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_JD79653A || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_UC8151D || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_SSD1306
-
-    //     /* Actual size in pixels, not bytes. */
-    //     size_in_px *= 8;
-    // #endif
-
-    /* Initialize the working buffer depending on the selected display.
-     * NOTE: buf2 == NULL when using monochrome displays. */
+    /* Initialize the working buffer. */
     lv_disp_buf_init(&disp_buf, buf1, buf2, size_in_px);
 
     lv_disp_drv_t disp_drv;
@@ -189,25 +199,8 @@ void cafs_runScreenGUI(void *pvParameter)
     disp_drv.rotated = 1;
 #endif
 
-    /* When using a monochrome display we need to register the callbacks:
-     * - rounder_cb
-     * - set_px_cb */
-    // #ifdef CONFIG_LV_TFT_DISPLAY_MONOCHROME
-    //     disp_drv.rounder_cb = disp_driver_rounder;
-    //     disp_drv.set_px_cb = disp_driver_set_px;
-    // #endif
-
     disp_drv.buffer = &disp_buf;
     lv_disp_drv_register(&disp_drv);
-
-    //     /* Register an input device when enabled on the menuconfig */
-    // #if CONFIG_LV_TOUCH_CONTROLLER != TOUCH_CONTROLLER_NONE
-    //     lv_indev_drv_t indev_drv;
-    //     lv_indev_drv_init(&indev_drv);
-    //     indev_drv.read_cb = touch_driver_read;
-    //     indev_drv.type = LV_INDEV_TYPE_POINTER;
-    //     lv_indev_drv_register(&indev_drv);
-    // #endif
 
     ESP_LOGI(TAG, "Drivers and buffers initialized");
     /* Create and start a periodic timer interrupt to call lv_tick_inc */
@@ -221,7 +214,6 @@ void cafs_runScreenGUI(void *pvParameter)
 
     /* Create the UI */
     ui_init();
-    // lv_demo_widgets();
     ESP_LOGI(TAG, "UI initialized");
 
     // Start loop
@@ -229,7 +221,7 @@ void cafs_runScreenGUI(void *pvParameter)
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(portTICK_PERIOD_MS));
 
         /* Try to take the semaphore, call lvgl related function on success */
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
@@ -241,9 +233,7 @@ void cafs_runScreenGUI(void *pvParameter)
 
     /* A task should NEVER return */
     free(buf1);
-    // #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
     free(buf2);
-    // #endif
     vTaskDelete(NULL);
 }
 
@@ -251,30 +241,34 @@ void cafs_runScreenGUI(void *pvParameter)
 //-- Private functions --//
 ///////////////////////////
 
-void _accessGranted(char *username)
+void IRAM_ATTR _cafs_isr_handler(void *arg)
 {
-    ui_Unlock();
-    ui_setName(username);
-    ui_Welcome_Animation(500);
+    xSemaphoreGiveFromISR(xInterruptSemaphore, NULL);
+}
+
+void _access_granted(char *username)
+{
+    ESP_LOGI(TAG, "Access Granted");
+    ui_unlock();
+    ui_set_name(username);
+    ui_anim_home_to_welcome(500);
 
     // if motor not unlocked...
-    ESP_LOGI("MOTOR", "UNLOCK");
+
     motor_unlock();
     vTaskDelay(pdMS_TO_TICKS(3000));
     motor_off();
-    ESP_LOGI("MOTOR", "OFF");
 }
 
-void _accessDenied()
+void _access_denied()
 {
-    ui_Lock();
-    ui_ShakeLock_Animation(0);
+    ESP_LOGE(TAG, "Access Denied");
+    ui_lock();
+    ui_anim_shake_lock(0);
 
     // if motor not locked...
-    ESP_LOGI("MOTOR", "LOCKING");
     motor_lock();
     vTaskDelay(pdMS_TO_TICKS(3000));
-    ESP_LOGI("MOTOR", "OFF");
     motor_off();
 }
 

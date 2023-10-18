@@ -34,11 +34,12 @@ extern "C"
     } WifiBar;
 
     /**
+     * DEPRECATED:
      * @brief Animation to fade color from current to green
      * @param TargetObject LVGL object to animate the color of
      * @param delay Delay before animation starts
      */
-    void ui_FadeGreen_Animation(lv_obj_t *TargetObject, int delay);
+    void ui_anim_fade_green(lv_obj_t *TargetObject, int delay);
 
     /**
      * @brief Runs 500ms animation to fade away time text, fade in the time at the top
@@ -46,63 +47,63 @@ extern "C"
      * @param delay Delay before animation starts
      * @param reverse_delay Delay before animation starts playing backward, -1 for no playback
      */
-    void ui_TimeAndIconsToTop_Animation(int delay, int reverse_delay);
+    void ui_anim_time_and_lock_to_top(int delay, int reverse_delay);
 
     /**
      * @brief Runs 4500ms animation that fades to a welcome screen and then
      * back to the home screen.
      * @param delay Delay before animation starts
      */
-    void ui_Welcome_Animation(int delay);
+    void ui_anim_home_to_welcome(int delay);
 
     /**
      * @brief Runs 750ms animation to fade in the keypad screen.
      * @param delay Delay before animation starts
      */
-    void ui_ShowKeypad_Animation(int delay);
+    void ui_anim_show_keypad(int delay);
 
     /**
      * @brief Runs 100ms animation that shakes the keypad repeatedly.
      * @param delay Delay before animation starts
      */
-    void ui_ShakeKeypad_Animation(int delay);
+    void ui_anim_shake_keypad(int delay);
 
     /**
      * @brief Hides lock icon and shows unlock icon
      */
-    void ui_Unlock();
+    void ui_unlock();
 
     /**
      * @brief Hides unlock icon and shows lock icon
      */
-    void ui_Lock();
+    void ui_lock();
 
     /**
      * @brief Runs 100ms animation that shakes the lock repeatedly.
      * @param delay Delay before animation starts
      */
-    void ui_ShakeLock_Animation(int delay);
+    void ui_anim_shake_lock(int delay);
 
     /**
      * @brief Runs 500ms animation that changes keypad screen to home screen
      */
-    void ui_KeypadToHome_Animation(int delay);
+    void ui_anim_keypad_to_home(int delay);
 
     /**
      * @brief Runs 4000ms animation that changes keypad screen to welcome screen, then to home screen
      */
-    void ui_KeypadToWelcome_Animation(int delay);
+    void ui_anim_keypad_to_welcome(int delay);
 
     /**
      * @brief Get the current number of bars showing on the wifi indicator
      */
-    WifiBar ui_GetWifiBarNumber();
+    WifiBar ui_get_wifi_bars();
 
     /**
      * @brief Set the current number of bars showing on the wifi indicator
      * @param bars Number of bars to show. WifiBar types: OneBar, TwoBars, ThreeBars, or NoBars
      */
-    void ui_SetWifiBarNumber(WifiBar bars);
+    void ui_set_wifi_bars(WifiBar bars);
 
     /**
      * @brief Set the text that displays time on the screen.
@@ -110,18 +111,18 @@ extern "C"
      * @param twelve_hour True if time should be set using a 12-hour format, false for 24-hour format
      * day, month, year, hour, and minute
      */
-    void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour);
+    void ui_update_datetime(const struct tm time_info, bool twelve_hour);
 
     /**
      * @brief Set the name text of the label that appears on welcome screen.
      * @param name A string to which the text will be set to
      */
-    void ui_setName(char *name);
+    void ui_set_name(char *name);
 
     /* START INTERNAL ONLY ----------------------------------------------------------------------------------------------------- */
 
     // SCREEN: ui_MainScreen
-    void ui_MainScreen_screen_init(void);
+    void ui_screen_init_main(void);
     extern lv_style_t colorPanelStyle;
     extern lv_style_t keypadPanelStyle;
     extern lv_style_t text48Style;

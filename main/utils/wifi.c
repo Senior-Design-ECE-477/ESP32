@@ -1,6 +1,9 @@
 #include "wifi.h"
 static const char *TAG = "wifi";
 
+static void _wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+static void _read_wifi_err(esp_err_t error);
+
 /*----------------------------------------------------------------
 Original Code Source: https://github.com/SIMS-IOT-Devices/FreeRTOS-ESP-IDF-AWS-IOT-Core/tree/main
 Modifications made by Thomas Wygal
@@ -8,7 +11,7 @@ Modifications made by Thomas Wygal
 The purpose of this is to print out the current state of the WiFi
 to the terminal for debugging purposes.
 */
-void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+void _wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     switch (event_id)
     {
@@ -41,7 +44,7 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/networ
 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/esp_event.html#_CPPv429esp_event_loop_create_default
 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_wifi.html
 */
-void initialize_wifi()
+void wifi_init()
 {
     // Initialize TCP/IP, Event loop, and WiFi as a Station
     ESP_ERROR_CHECK(esp_netif_init());
@@ -53,8 +56,8 @@ void initialize_wifi()
     ESP_ERROR_CHECK(esp_wifi_init(&wifi_initiation));
 
     // Set-up the event handlers
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, _wifi_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, _wifi_event_handler, NULL));
 
     // Configure the WiFi
     wifi_config_t wifi_configuration = {
@@ -75,7 +78,7 @@ void initialize_wifi()
     // esp_wifi_connect();
 }
 
-static void _readWifiError(esp_err_t error)
+void _read_wifi_err(esp_err_t error)
 {
     switch (error)
     {
@@ -83,19 +86,22 @@ static void _readWifiError(esp_err_t error)
         ESP_LOGI(TAG, "Connection result: (ESP_OK) succeed");
         break;
     case ESP_ERR_WIFI_NOT_INIT:
-        ESP_LOGI(TAG, "Connection result: (ESP_ERR_WIFI_NOT_INIT) WiFi is not initialized by esp_wifi_init");
+        ESP_LOGE(TAG, "Connection result: (ESP_ERR_WIFI_NOT_INIT) WiFi is not initialized by esp_wifi_init");
         break;
     case ESP_ERR_WIFI_NOT_STARTED:
-        ESP_LOGI(TAG, "Connection result: (ESP_ERR_WIFI_NOT_STARTED) WiFi is not started by esp_wifi_start");
+        ESP_LOGE(TAG, "Connection result: (ESP_ERR_WIFI_NOT_STARTED) WiFi is not started by esp_wifi_start");
         break;
     case ESP_ERR_WIFI_CONN:
-        ESP_LOGI(TAG, "Connection result: (ESP_ERR_WIFI_CONN) WiFi internal error, station or soft-AP control block wrong");
+        ESP_LOGE(TAG, "Connection result: (ESP_ERR_WIFI_CONN) WiFi internal error, station or soft-AP control block wrong");
         break;
     case ESP_ERR_WIFI_SSID:
-        ESP_LOGI(TAG, "Connection result: (ESP_ERR_WIFI_SSID) SSID of AP which station connects is invalid");
+        ESP_LOGE(TAG, "Connection result: (ESP_ERR_WIFI_SSID) SSID of AP which station connects is invalid");
+        break;
+    case ESP_ERR_WIFI_MODE:
+        ESP_LOGE(TAG, "Connection result: (ESP_ERR_WIFI_MODE) Wifi not set to correct mode");
         break;
     default:
-        ESP_LOGI(TAG, "Connection result: (OTHER - %d) Error: %s", error, esp_err_to_name(error));
+        ESP_LOGE(TAG, "Connection result: (OTHER - %d) Error: %s", error, esp_err_to_name(error));
         break;
     }
 }
@@ -115,7 +121,7 @@ wifi_ap_record_t wifi_connect()
             vTaskDelay(pdMS_TO_TICKS(1000)); // Wait for disconnection
             ESP_LOGI(TAG, "Reconnecting");
             esp_err_t wifi_result = esp_wifi_connect(); // Reconnect
-            _readWifiError(wifi_result);
+            _read_wifi_err(wifi_result);
             esp_wifi_sta_get_ap_info(&wifi_info);
         }
         else
@@ -125,9 +131,9 @@ wifi_ap_record_t wifi_connect()
     }
     else
     {
-        ESP_LOGI(TAG, "Wifi is not connected, attempting to connect.");
+        ESP_LOGW(TAG, "Wifi is not connected, attempting to connect.");
         esp_err_t wifi_result = esp_wifi_connect();
-        _readWifiError(wifi_result);
+        _read_wifi_err(wifi_result);
         esp_wifi_sta_get_ap_info(&wifi_info);
     }
 

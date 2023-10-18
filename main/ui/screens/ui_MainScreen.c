@@ -6,7 +6,7 @@
 #include "../ui.h"
 static const char *TAG = "ui";
 
-void ui_MainScreen_screen_init(void)
+void ui_screen_init_main(void)
 {
     ui_MainScreen = lv_obj_create(NULL, NULL);
     static lv_style_t backgroundStyle;
@@ -195,7 +195,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_auto_realign(ui_PasscodeLabel, true);
 }
 
-WifiBar ui_GetWifiBarNumber()
+WifiBar ui_get_wifi_bars()
 {
     if (!lv_obj_get_hidden(ui_WifiIcon1Bar))
     {
@@ -215,9 +215,9 @@ WifiBar ui_GetWifiBarNumber()
     }
 }
 
-void ui_SetWifiBarNumber(WifiBar bar)
+void ui_set_wifi_bars(WifiBar bar)
 {
-    if (ui_GetWifiBarNumber() == bar)
+    if (ui_get_wifi_bars() == bar)
     {
         return;
     }
@@ -255,7 +255,7 @@ void ui_SetWifiBarNumber(WifiBar bar)
     }
 }
 
-void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
+void ui_update_datetime(const struct tm time_info, bool twelve_hour)
 {
     char time[6] = "12:59\0"; // 00:00
     char ampm[3] = "AM\0";
@@ -316,7 +316,11 @@ void ui_UpdateDateTime(const struct tm time_info, bool twelve_hour)
     // free(time);
 }
 
-void ui_setName(char *name)
+void ui_set_name(char *name)
 {
-    lv_label_set_text(ui_FirstNameLabel, name);
+    if (strcmp(lv_label_get_text(ui_FirstNameLabel), name) != 0)
+    {
+        lv_label_set_text(ui_FirstNameLabel, name);
+        ESP_LOGI(TAG, "Name changed to %s", name);
+    }
 }

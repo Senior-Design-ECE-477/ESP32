@@ -6,5 +6,5 @@
 #define NTPSERVER "north-america.pool.ntp.org"
 #define TIMEZONE "EST5EDT"
 
-struct tm getTime();
-void initialize_sntp(void);
+struct tm time_get_now();
+void time_init(void);

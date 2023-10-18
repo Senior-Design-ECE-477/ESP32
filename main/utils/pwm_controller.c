@@ -17,7 +17,7 @@ static const char *TAG = "pwm";
 //-- Public functions --//
 //////////////////////////
 
-void pwm_ControllerInit(void)
+void pwm_init(void)
 {
     ledc_channel_config_t ledc_channel = {
         .gpio_num = LED_PWM_PIN,
@@ -39,7 +39,7 @@ void pwm_ControllerInit(void)
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
 }
 
-void pwm_ControllerSet(float percent_fraction)
+void pwm_set(float percent_fraction)
 {
     uint32_t max_duty = (1 << LED_PWM_BIT_NUM) - 1;
     uint32_t duty_cycle = lroundf(percent_fraction * (float)max_duty);
