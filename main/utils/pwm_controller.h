@@ -13,6 +13,10 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+<<<<<<< HEAD
+=======
+#include "pinout.h"
+>>>>>>> 508bfaf (new stuff)
 
 ////////////////
 //-- Define --//
@@ -25,8 +29,13 @@
 #define LED_PWM_TIMER LEDC_TIMER_1
 #define LED_PWM_BIT_NUM LEDC_TIMER_5_BIT
 #define LED_PWM_FREQUENCY 100000
+<<<<<<< HEAD
 
 #define LED_PWM_PIN GPIO_NUM_21
+=======
+#define LEDC_HIGH_SPEED_MODE 0
+
+>>>>>>> 508bfaf (new stuff)
 
 ////////////////////////////////////
 //-- Public function prototypes --//

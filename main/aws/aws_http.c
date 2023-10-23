@@ -14,7 +14,6 @@ int giveAccess(char *str)
 
     return_value = regcomp(&regex, "name", 0);
     return_value = regexec(&regex, str, 0, NULL, 0);
-
     regfree(&regex);
     return return_value;
 }

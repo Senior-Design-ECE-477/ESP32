@@ -66,7 +66,11 @@ void initialize_wifi()
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(interface, &wifi_configuration));
     // ESP_ERROR_CHECK(esp_wifi_set_protocol(interface, WIFI_PROTOCOL_11G));         // Only use fastest wifi protocol
+<<<<<<< HEAD
     // ESP_ERROR_CHECK(esp_wifi_set_bandwidth(interface, WIFI_BW_HT40));             // HT40 or HT20 or options... sets MHz but doesn't affect speed
+=======
+    ESP_ERROR_CHECK(esp_wifi_set_bandwidth(interface, WIFI_BW_HT40));             // HT40 or HT20 or options... sets MHz but doesn't affect speed
+>>>>>>> 508bfaf (new stuff)
     ESP_ERROR_CHECK(esp_wifi_config_80211_tx_rate(interface, WIFI_PHY_RATE_54M)); // Speeds up wifi to up to 54Mbps
 
     // Start and connect the ESP32 to the WiFi
@@ -102,11 +106,19 @@ static void _readWifiError(esp_err_t error)
 
 wifi_ap_record_t wifi_connect()
 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 508bfaf (new stuff)
     wifi_ap_record_t wifi_info;
     esp_err_t connected = esp_wifi_sta_get_ap_info(&wifi_info);
 
     if (connected == ESP_OK)
     {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 508bfaf (new stuff)
         // Very low signal, attempt to reconnect
         if (wifi_info.rssi < -90)
         {

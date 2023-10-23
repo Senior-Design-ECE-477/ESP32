@@ -48,15 +48,17 @@ void cafs_init()
     pwm_ControllerInit();    // Setup pwm
     pwm_ControllerSet(0.95); // Start with dimmed pwm
     init_uart();
-    // Setul's test setup
     // esp_rom_gpio_pad_select_gpio(13);
     // gpio_set_direction(13, GPIO_MODE_OUTPUT);
     // gpio_set_level(13, 1);
     // esp_rom_gpio_pad_select_gpio(14);
     // gpio_set_direction(14, GPIO_MODE_INPUT);
     // esp_rom_gpio_pad_select_gpio(32);
-    gpio_set_direction(38, GPIO_MODE_INPUT);
-    gpio_set_direction(34, GPIO_MODE_INPUT);
+    gpio_set_direction(FINGER_TOUCHIC_PIN, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(FINGER_TOUCHIC_PIN, GPIO_PULLDOWN_ONLY);
+    gpio_set_direction(FINGER_ENROLL_PIN, GPIO_MODE_INPUT);
+
+    esp_sleep_enable_ext0_wakeup(FINGER_TOUCHIC_PIN, 1);
 }
 
 void cafs_entryEventISR() {}
@@ -119,9 +121,16 @@ void cafs_runMainTask(void *pvParameter)
     ESP_LOGI(TAG, "Main task started");
     uint8_t count = 0; // Max number of 256
     int id = 3;
+<<<<<<< HEAD
 
     while (1)
     {
+=======
+    int sleepTimer = 0;
+    while (1)
+    {
+        
+>>>>>>> 508bfaf (new stuff)
         vTaskDelay(pdMS_TO_TICKS(20)); // Delay between checks
         if (count >= 250)              // Every 20ms * 250 = 5000ms
         {
@@ -129,26 +138,63 @@ void cafs_runMainTask(void *pvParameter)
             struct tm time_now = getTime();    // Get datetime
             ui_UpdateDateTime(time_now, true); // Update datetime on UI
             count = 0;
+<<<<<<< HEAD
+=======
+            sleepTimer ++;
+
+            if(sleepTimer >= 2){
+                ESP_LOGI(TAG, "Going to sleep");
+                pwm_ControllerSet(0.05);
+                vTaskDelay(pdMS_TO_TICKS(200));
+                esp_light_sleep_start();     
+                sleepTimer = 0;
+            }
+            pwm_ControllerSet(0.95);
+            // static const char *DAY_OF_WEEK[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+            // static const char *MONTH[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+            
+            // printf("%d %d %d ", time_now.tm_hour, time_now.tm_min, time_now.tm_sec);
+            // printf(DAY_OF_WEEK[time_now.tm_wday]);
+            // printf(" %d ", time_now.tm_mday);
+            // printf(MONTH[time_now.tm_mon]);
+            // printf(" %d\n", time_now.tm_year + 1900);
+>>>>>>> 508bfaf (new stuff)
         }
         else
         {
             count++;
         }
+<<<<<<< HEAD
         // Setul's test setup
         if (gpio_get_level(34) == 1)
         {
+=======
+        
+        // if (gpio_get_level(FINGER_ENROLL_PIN) == 1)
+        // {
+            // led_light_on();
+            // vTaskDelay(100 / portTICK_PERIOD_MS);
+            // printf("Fingerprint ID: %d\n", enroll_finger());
+            // led_light_off();
+        // }
+        if(gpio_get_level(FINGER_TOUCHIC_PIN) == 1){
+>>>>>>> 508bfaf (new stuff)
             led_light_on();
             id = identify_finger();
             printf("ID:  %d\n", id);
             led_light_off();
             cafs_checkAccess(id);
         }
+<<<<<<< HEAD
         if(gpio_get_level(38) == 0){
             led_light_on();
             vTaskDelay(100 / portTICK_PERIOD_MS);
             printf("Fingerprint ID: %d\n", enroll_finger());
             led_light_off();
         }
+=======
+    
+>>>>>>> 508bfaf (new stuff)
         // if (gpio_get_level(32) == 1)
         // {
         //     ui_ShowKeypad_Animation(0);
@@ -156,8 +202,12 @@ void cafs_runMainTask(void *pvParameter)
         //     ui_KeypadToWelcome_Animation(10);
         // }
     }
+<<<<<<< HEAD
 
     vTaskDelete(NULL);
+=======
+    //vTaskDelete(NULL);
+>>>>>>> 508bfaf (new stuff)
 }
 
 void cafs_runScreenGUI(void *pvParameter)

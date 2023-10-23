@@ -30,6 +30,9 @@
 #include "utils/wifi.h"
 #include "ui/ui.h"
 #include "fingerScanner/sen14585.h"
+#include "utils/pinout.h"
+#include "esp_sleep.h"
+
 
 /* lvgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE

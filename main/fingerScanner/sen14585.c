@@ -52,7 +52,7 @@ esp_err_t init_uart() {
     uart_param_config(UART_PORT_NUM, &uart_config);
     //Set UART pins (using UART0 default pins ie no changes.)
 
-    uart_set_pin(UART_PORT_NUM, 8, 7, -1, -1);
+    uart_set_pin(UART_PORT_NUM, FINGER_TX_PIN, FINGER_RX_PIN, -1, -1);
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
 

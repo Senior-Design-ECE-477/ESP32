@@ -1,5 +1,5 @@
 #include "ntp_time.h"
-
+#include "esp_log.h"
 /*----------------------------------------------------------------
 This function is to get the current time using the NTP server, getting
 the current time, and converting it to the local time before printing it out

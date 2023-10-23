@@ -7,7 +7,7 @@
 #include "freertos/FreeRTOS.h"
 #include "esp_err.h"
 #include "sen14585_helper.h"
-
+#include "../utils/pinout.h"
 
 #define UART_PORT_NUM 1
 
